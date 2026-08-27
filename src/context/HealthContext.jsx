@@ -16,8 +16,8 @@ import {
 const HealthContext = createContext();
 
 export const HealthProvider = ({ children }) => {
-  // Active Tab: 'home', 'medications', 'exams', 'consultations', 'profile', 'vitals'
-  const [activeTab, setActiveTab] = useState('home');
+  // Active Tab: 'landing' (Inicial) | 'home' | 'medications' | 'exams' | 'consultations' | 'profile' | 'vitals'
+  const [activeTab, setActiveTab] = useState('landing');
   // View Mode: 'responsive' (Desktop/Notebook/Tablet/Mobile Fluid) | 'phoneFrame' (Figma Mobile Bezel)
   const [viewMode, setViewMode] = useState('responsive');
 
@@ -374,11 +374,16 @@ export const HealthProvider = ({ children }) => {
 
     const unsubscribe = subscribeToAuth((user) => {
       setAuthUser(user);
-      if (user && user.displayName) {
-        setUserProfile((prev) => ({
-          ...prev,
-          name: user.displayName
-        }));
+      if (user) {
+        if (user.displayName) {
+          setUserProfile((prev) => ({
+            ...prev,
+            name: user.displayName
+          }));
+        }
+        setActiveTab('home');
+      } else {
+        setActiveTab('landing');
       }
     });
 
@@ -436,6 +441,31 @@ export const HealthProvider = ({ children }) => {
             if (remoteData.exams) setExams(remoteData.exams);
             if (remoteData.appointments) setAppointments(remoteData.appointments);
             if (remoteData.vitals) setVitals(remoteData.vitals);
+            setSyncStatus('synced');
+            setTimeout(() => {
+              isRemoteUpdate.current = false;
+            }, 300);
+          } else if (authUser) {
+            // New user without remote data yet -> Initialize clean record
+            isRemoteUpdate.current = true;
+            const newProfile = {
+              name: authUser.displayName || 'Novo Paciente',
+              age: 'Não informado',
+              location: 'Brasil',
+              greeting: 'Bem-vindo ao seu acompanhamento de saúde!',
+              avatar: `https://api.dicebear.com/10.x/voxel-art/svg?seed=${encodeURIComponent(authUser.displayName || authUser.email)}`,
+              bloodType: '--',
+              height: '--',
+              weight: '--',
+              allergiesAndConditions: [],
+              emergencyContact: { name: '', relation: '', phone: '' },
+              healthPlan: { name: 'Sem plano cadastrado', planType: '', number: '' }
+            };
+            setUserProfile(newProfile);
+            setMedications([]);
+            setIntakeHistory([]);
+            setExams([]);
+            setAppointments([]);
             setSyncStatus('synced');
             setTimeout(() => {
               isRemoteUpdate.current = false;
