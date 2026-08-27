@@ -177,6 +177,16 @@ export const subscribeToPatientRecord = (patientUid, onDataChange, onError) => {
 };
 
 /**
+ * Helper to sanitize payloads and prevent Firestore undefined field errors
+ */
+const sanitizeForFirestore = (data) => {
+  if (data === undefined) return null;
+  return JSON.parse(
+    JSON.stringify(data, (key, value) => (value === undefined ? null : value))
+  );
+};
+
+/**
  * Save / Update patient record in Firestore
  */
 export const savePatientRecordToFirestore = async (patientUid, healthData) => {
@@ -185,14 +195,17 @@ export const savePatientRecordToFirestore = async (patientUid, healthData) => {
   try {
     const targetDocId = patientUid ? `patient_${patientUid}` : DEFAULT_PATIENT_DOC_ID;
     const docRef = doc(db, HEALTH_COLLECTION, targetDocId);
+    const cleanPayload = sanitizeForFirestore(healthData);
+
     await setDoc(
       docRef,
       {
-        ...healthData,
+        ...cleanPayload,
         updatedAt: new Date().toISOString()
       },
       { merge: true }
     );
+    console.log(`[Firebase] Record successfully saved to Firestore: ${targetDocId}`);
     return true;
   } catch (error) {
     console.error('[Firebase] Error saving record to Firestore:', error);
@@ -330,10 +343,12 @@ export const saveFamilyGroupHealthData = async (sixDigitCode, healthData) => {
 
   try {
     const docRef = doc(db, FAMILY_COLLECTION, String(sixDigitCode).trim());
+    const cleanPayload = sanitizeForFirestore(healthData);
+
     await setDoc(
       docRef,
       {
-        healthRecords: healthData,
+        healthRecords: cleanPayload,
         updatedAt: new Date().toISOString()
       },
       { merge: true }

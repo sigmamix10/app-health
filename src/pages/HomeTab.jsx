@@ -1,27 +1,53 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
-import { Pill, Activity, Heart, Calendar, ChevronRight, Users } from 'lucide-react';
+import { Pill, Activity, Heart, Calendar, ChevronRight, Users, Volume2, VolumeX } from 'lucide-react';
 import { DirectionsModal } from '../components/modals/DirectionsModal';
 import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
 
 export const HomeTab = () => {
-  const { userProfile, appointments, medications, vitals, setActiveTab, toggleMedicationStatus, familyGroupCode, familyGroup } = useHealth();
+  const {
+    userProfile,
+    appointments,
+    medications,
+    vitals,
+    setActiveTab,
+    toggleMedicationStatus,
+    familyGroupCode,
+    familyGroup,
+    speakText,
+    isSpeaking,
+    stopSpeech
+  } = useHealth();
+
   const [selectedApp, setSelectedApp] = useState(null);
   const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
   const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
 
-  // Next Appointment (Dr. Alexandre Santos)
+  // Next Appointment
   const nextAppointment = appointments.find((app) => app.isUpcoming) || appointments[0];
 
-  // Today's medications (top 2 active)
+  // Today's medications
   const todayMeds = medications.filter((m) => m.category === 'active').slice(0, 2);
+
+  const handleAudioSummary = () => {
+    if (isSpeaking) {
+      stopSpeech();
+      return;
+    }
+
+    const text = `Olá ${userProfile.name}. ${userProfile.greeting} ${
+      nextAppointment ? `Sua próxima consulta é com ${nextAppointment.doctor}, ${nextAppointment.specialty}, marcada para ${nextAppointment.dateText || nextAppointment.fullDate}.` : ''
+    } Você tem ${medications.filter((m) => m.status === 'pending').length} medicamento(s) pendente(s) hoje.`;
+
+    speakText(text);
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Top Profile Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px' }}>
               Olá, {userProfile.name}
             </h1>
@@ -45,6 +71,27 @@ export const HomeTab = () => {
             >
               <Users size={14} />
               <span>{familyGroupCode ? `${familyGroup?.familyName || 'Família'} (${familyGroupCode})` : '+ Grupo Familiar'}</span>
+            </button>
+
+            <button
+              onClick={handleAudioSummary}
+              style={{
+                background: isSpeaking ? '#FEE2E2' : '#E6F5F2',
+                color: isSpeaking ? '#DC2626' : '#0D6C5D',
+                border: 'none',
+                borderRadius: '100px',
+                padding: '5px 12px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+              title="Ouvir resumo de voz"
+            >
+              {isSpeaking ? <VolumeX size={14} /> : <Volume2 size={14} />}
+              <span>{isSpeaking ? 'Parar Áudio' : 'Ouvir Resumo'}</span>
             </button>
           </div>
           <p style={{ fontSize: '14px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>

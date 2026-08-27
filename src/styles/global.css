@@ -647,3 +647,74 @@ body {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ----------------------------------------------------
+   ACCESSIBILITY (a11y) & HIGH CONTRAST STYLES
+---------------------------------------------------- */
+/* Font Scaling Classes */
+.font-scale-large {
+  font-size: 112% !important;
+}
+
+.font-scale-xlarge {
+  font-size: 125% !important;
+}
+
+/* Focus Visible Indicator for Keyboard Navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #0D6C5D !important;
+  outline-offset: 3px !important;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --bg-app: #000000 !important;
+  --bg-card: #121212 !important;
+  --bg-input: #1E1E1E !important;
+
+  --text-main: #FFFFFF !important;
+  --text-muted: #F3F4F6 !important;
+  --text-light: #E5E7EB !important;
+
+  --primary: #00E6B8 !important;
+  --primary-dark: #00B38F !important;
+  --primary-light: #1A3D36 !important;
+  --primary-hover: #00FFCC !important;
+
+  --border-color: #374151 !important;
+
+  --status-green-bg: #064E3B !important;
+  --status-green-text: #34D399 !important;
+  --status-orange-bg: #78350F !important;
+  --status-orange-text: #FBBF24 !important;
+}
+
+.high-contrast .card {
+  border: 2px solid #374151 !important;
+  background-color: #121212 !important;
+  color: #FFFFFF !important;
+}
+
+.high-contrast .desktop-header {
+  background-color: #000000 !important;
+  border-bottom: 2px solid #374151 !important;
+}
+
+.high-contrast .bottom-nav {
+  background-color: #000000 !important;
+  border-top: 2px solid #374151 !important;
+}
+
+.high-contrast .desktop-nav-btn {
+  color: #FFFFFF !important;
+}
+
+.high-contrast .desktop-nav-btn.active {
+  background-color: #00E6B8 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+}

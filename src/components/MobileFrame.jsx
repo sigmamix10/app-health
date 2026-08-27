@@ -3,10 +3,14 @@ import { useHealth } from '../context/HealthContext';
 import { BottomNav } from './BottomNav';
 import { Wifi, Battery, Signal, Activity, Home, Pill, FileText, Calendar, User, Monitor, Cloud, CloudOff } from 'lucide-react';
 import { AuthModal } from './modals/AuthModal';
+import { AccessibilityWidget } from './AccessibilityWidget';
 
 export const MobileFrame = ({ children }) => {
-  const { viewMode, setViewMode, activeTab, setActiveTab, userProfile, syncStatus, isFirebaseConfigured, authUser } = useHealth();
+  const { viewMode, setViewMode, activeTab, setActiveTab, userProfile, syncStatus, isFirebaseConfigured, authUser, fontScale, highContrast } = useHealth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  const fontClass = fontScale === 'large' ? 'font-scale-large' : fontScale === 'xlarge' ? 'font-scale-xlarge' : '';
+  const contrastClass = highContrast ? 'high-contrast' : '';
 
   const navItems = [
     { id: 'home', label: 'Início', icon: Home },
@@ -38,7 +42,7 @@ export const MobileFrame = ({ children }) => {
   };
 
   return (
-    <div className="app-wrapper">
+    <div className={`app-wrapper ${fontClass} ${contrastClass}`}>
       {viewMode === 'responsive' ? (
         /* ---------------- NATIVE FULL-SCREEN RESPONSIVE WEB APP ---------------- */
         <div className="responsive-container">
@@ -182,8 +186,9 @@ export const MobileFrame = ({ children }) => {
         </div>
       )}
 
-      {/* Global Auth Modal Trigger */}
+      {/* Global Auth Modal Trigger & Accessibility Widget */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <AccessibilityWidget />
     </div>
   );
 };

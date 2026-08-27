@@ -24,6 +24,31 @@ export const HealthProvider = ({ children }) => {
   // Firebase Auth State
   const [authUser, setAuthUser] = useState(null);
 
+  // Accessibility (a11y) States
+  const [fontScale, setFontScale] = useState('normal'); // 'normal' | 'large' | 'xlarge'
+  const [highContrast, setHighContrast] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const speakText = (text) => {
+    if ('speechSynthesis' in window && text) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 0.92;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const stopSpeech = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
   // Family Group State (6-digit code persistence)
   const [familyGroupCode, setFamilyGroupCode] = useState(() => {
     try {
@@ -779,6 +804,13 @@ export const HealthProvider = ({ children }) => {
         registerPatient,
         loginPatient,
         logoutPatient,
+        fontScale,
+        setFontScale,
+        highContrast,
+        setHighContrast,
+        isSpeaking,
+        speakText,
+        stopSpeech,
         familyGroupCode,
         familyGroup,
         createFamilyGroup,
