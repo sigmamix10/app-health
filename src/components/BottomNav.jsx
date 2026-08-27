@@ -3,7 +3,11 @@ import { useHealth } from '../context/HealthContext';
 import { Home, Pill, FileText, Calendar, User } from 'lucide-react';
 
 export const BottomNav = () => {
-  const { activeTab, setActiveTab } = useHealth();
+  const { activeTab, setActiveTab, authUser } = useHealth();
+
+  if (activeTab === 'landing' || (!authUser && activeTab !== 'guest')) {
+    return null;
+  }
 
   const navItems = [
     { id: 'home', label: 'Início', icon: Home },
