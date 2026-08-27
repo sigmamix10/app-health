@@ -1,0 +1,193 @@
+import React, { useState } from 'react';
+import { useHealth } from '../context/HealthContext';
+import { Calendar, Bell, MapPin, Clock, Plus } from 'lucide-react';
+import { RescheduleModal } from '../components/modals/RescheduleModal';
+import { DirectionsModal } from '../components/modals/DirectionsModal';
+import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
+import { AddAppointmentModal } from '../components/modals/AddAppointmentModal';
+
+export const ConsultationsTab = () => {
+  const { appointments } = useHealth();
+  const [selectedReschedule, setSelectedReschedule] = useState(null);
+  const [selectedDirections, setSelectedDirections] = useState(null);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 className="page-title">Minhas Consultas</h1>
+          <p className="page-subtitle">Calendário e histórico médico</p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="btn-primary"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              borderRadius: '12px'
+            }}
+          >
+            <Plus size={18} />
+            <span>Nova Consulta</span>
+          </button>
+
+          <button
+            onClick={() => setIsNotifOpen(true)}
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #EBF1F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#0F172A',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+            }}
+            aria-label="Notificações"
+          >
+            <Bell size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* List of Doctor Cards */}
+      <div className="grid-responsive-2">
+        {appointments.map((app) => (
+          <div
+            key={app.id}
+            className="card"
+            style={{ padding: '18px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+          >
+            {/* Doctor Info & Badge */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <img
+                  src={app.avatar}
+                  alt={app.doctor}
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '1.5px solid #EBF1F0'
+                  }}
+                />
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>{app.doctor}</h3>
+                  <p style={{ fontSize: '13px', color: '#0D6C5D', fontWeight: 700, marginTop: '2px' }}>
+                    {app.specialty}
+                  </p>
+                </div>
+              </div>
+
+              <span
+                className={`badge ${
+                  app.status === 'Realizada'
+                    ? 'badge-green'
+                    : app.dateText === 'Amanhã'
+                    ? 'badge-orange'
+                    : 'badge-orange'
+                }`}
+              >
+                {app.dateText}
+              </span>
+            </div>
+
+            {/* Location & Time Gray Box (Exact Figma match) */}
+            {app.hospital && (
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  border: '1px solid #F1F5F9',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#334155' }}>
+                  <MapPin size={15} style={{ color: '#64748B', flexShrink: 0 }} />
+                  <span>{app.hospital}</span>
+                </div>
+                {app.timeText && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#334155' }}>
+                    <Clock size={15} style={{ color: '#64748B', flexShrink: 0 }} />
+                    <span>Horário: {app.timeText} • {app.type}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Footer Action Links */}
+            {app.isUpcoming && (
+              <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 500 }}>
+                  {app.insurance}
+                </span>
+
+                <div style={{ display: 'flex', gap: '14px' }}>
+                  <button
+                    onClick={() => setSelectedReschedule(app)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#475569',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Reagendar
+                  </button>
+                  <button
+                    onClick={() => setSelectedDirections(app)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#0D6C5D',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Como Chegar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Modals */}
+      <AddAppointmentModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
+      <RescheduleModal
+        isOpen={!!selectedReschedule}
+        onClose={() => setSelectedReschedule(null)}
+        appointment={selectedReschedule}
+      />
+      <DirectionsModal
+        isOpen={!!selectedDirections}
+        onClose={() => setSelectedDirections(null)}
+        appointment={selectedDirections}
+      />
+      <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+    </div>
+  );
+};
