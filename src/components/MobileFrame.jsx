@@ -1,10 +1,10 @@
 import React from 'react';
 import { useHealth } from '../context/HealthContext';
 import { BottomNav } from './BottomNav';
-import { Wifi, Battery, Signal, Smartphone, Activity, Home, Pill, FileText, Calendar, User, Monitor, Cloud, CloudOff, Database, CheckCircle2 } from 'lucide-react';
+import { Wifi, Battery, Signal, Activity, Home, Pill, FileText, Calendar, User, Monitor, Cloud, CloudOff } from 'lucide-react';
 
 export const MobileFrame = ({ children }) => {
-  const { viewMode, setViewMode, activeTab, setActiveTab, userProfile, syncStatus, isFirebaseConfigured } = useHealth();
+  const { viewMode, setViewMode, activeTab, setActiveTab, userProfile, syncStatus, isFirebaseConfigured, authUser } = useHealth();
 
   const navItems = [
     { id: 'home', label: 'Início', icon: Home },
@@ -30,18 +30,9 @@ export const MobileFrame = ({ children }) => {
           </span>
         );
       }
-      return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: '12px', background: '#E6F5F2', color: '#0D6C5D' }}>
-          <Cloud size={14} /> Firebase Nuvem (Exclusivo)
-        </span>
-      );
     }
 
-    return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 600, padding: '4px 10px', borderRadius: '12px', background: '#F1F5F9', color: '#64748B' }}>
-        <CloudOff size={14} /> Firebase Desconectado
-      </span>
-    );
+    return null;
   };
 
   return (
@@ -88,18 +79,42 @@ export const MobileFrame = ({ children }) => {
                 })}
               </nav>
 
-              {/* Desktop User Avatar & Mode Toggle */}
-              <div className="desktop-user-menu">
+              {/* Desktop User Avatar & Account Button */}
+              <div className="desktop-user-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {renderSyncBadge()}
 
-                <button
-                  className="device-toggle-btn"
-                  onClick={() => setViewMode('phoneFrame')}
-                  title="Simular visualização em moldura de celular"
-                >
-                  <Smartphone size={15} />
-                  Simular Celular
-                </button>
+                {authUser ? (
+                  <span
+                    onClick={() => setActiveTab('profile')}
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: '#0D6C5D',
+                      background: '#E6F5F2',
+                      padding: '4px 12px',
+                      borderRadius: '100px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {authUser.email}
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: '#0D6C5D',
+                      background: '#E6F5F2',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '100px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Entrar / Cadastrar
+                  </button>
+                )}
 
                 <img
                   src={userProfile.avatar}

@@ -2,7 +2,15 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import {
   isFirebaseConfigured,
   subscribeToPatientRecord,
-  savePatientRecordToFirestore
+  savePatientRecordToFirestore,
+  createFamilyGroupInFirestore,
+  joinFamilyGroupInFirestore,
+  subscribeToFamilyGroupDoc,
+  saveFamilyGroupHealthData,
+  registerUserWithEmail,
+  loginUserWithEmail,
+  logoutUser,
+  subscribeToAuth
 } from '../services/firebase';
 
 const HealthContext = createContext();
@@ -12,6 +20,19 @@ export const HealthProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState('home');
   // View Mode: 'responsive' (Desktop/Notebook/Tablet/Mobile Fluid) | 'phoneFrame' (Figma Mobile Bezel)
   const [viewMode, setViewMode] = useState('responsive');
+
+  // Firebase Auth State
+  const [authUser, setAuthUser] = useState(null);
+
+  // Family Group State (6-digit code persistence)
+  const [familyGroupCode, setFamilyGroupCode] = useState(() => {
+    try {
+      return localStorage.getItem('app_health_family_code') || null;
+    } catch (e) {
+      return null;
+    }
+  });
+  const [familyGroup, setFamilyGroup] = useState(null);
 
   // Cloud Sync Status: 'synced' | 'syncing' | 'error' | 'disconnected'
   const [syncStatus, setSyncStatus] = useState(isFirebaseConfigured ? 'synced' : 'disconnected');
@@ -276,7 +297,7 @@ export const HealthProvider = ({ children }) => {
       type: 'Atendimento presencial',
       insurance: 'Convênio Bradesco Saúde',
       status: 'Confirmado', // 'Confirmado' | 'Amanhã'
-      avatar: '/avatars/dr_alexandre.jpg',
+      avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Alexandre',
       address: 'Av. Albert Einstein, 627 - Morumbi, São Paulo - SP',
       isUpcoming: true
     },
@@ -291,7 +312,7 @@ export const HealthProvider = ({ children }) => {
       type: 'Consulta de Rotina',
       insurance: 'Convênio Bradesco Saúde',
       status: 'Agendado',
-      avatar: '/avatars/dra_beatriz.jpg',
+      avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Beatriz',
       address: 'Av. Paulista, 1500 - Cj 82, Jardins, São Paulo - SP',
       isUpcoming: true
     },
@@ -306,7 +327,7 @@ export const HealthProvider = ({ children }) => {
       type: 'Consulta Realizada',
       insurance: 'Convênio Bradesco Saúde',
       status: 'Realizada',
-      avatar: '/avatars/dr_carlos.jpg',
+      avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Carlos',
       address: 'Rua Vergueiro, 1200 - Vila Mariana, São Paulo - SP',
       isUpcoming: false
     }
@@ -347,51 +368,201 @@ export const HealthProvider = ({ children }) => {
     ]
   });
 
-  // 1. Subscribe to Real-Time Updates EXCLUSIVELY from Firebase Cloud Firestore
+  // 0. Subscribe to Firebase Auth Changes
   useEffect(() => {
     if (!isFirebaseConfigured) return;
 
-    const unsubscribe = subscribeToPatientRecord(
-      (remoteData) => {
-        if (remoteData) {
-          isRemoteUpdate.current = true;
-          if (remoteData.userProfile) setUserProfile(remoteData.userProfile);
-          if (remoteData.medications) setMedications(remoteData.medications);
-          if (remoteData.intakeHistory) setIntakeHistory(remoteData.intakeHistory);
-          if (remoteData.exams) setExams(remoteData.exams);
-          if (remoteData.appointments) setAppointments(remoteData.appointments);
-          if (remoteData.vitals) setVitals(remoteData.vitals);
-          setSyncStatus('synced');
-          setTimeout(() => {
-            isRemoteUpdate.current = false;
-          }, 300);
-        }
-      },
-      (error) => {
-        console.error('[HealthContext] Error in Firestore subscription:', error);
-        setSyncStatus('error');
+    const unsubscribe = subscribeToAuth((user) => {
+      setAuthUser(user);
+      if (user && user.displayName) {
+        setUserProfile((prev) => ({
+          ...prev,
+          name: user.displayName
+        }));
       }
-    );
+    });
 
     return () => unsubscribe();
   }, []);
 
-  // 2. Persist EXCLUSIVELY to Firebase Cloud Firestore on state modifications
+  // 1. Subscribe to Real-Time Updates from Firebase Cloud Firestore (Individual or Family Group)
+  useEffect(() => {
+    if (!isFirebaseConfigured) return;
+
+    let unsubscribe = () => {};
+
+    if (familyGroupCode) {
+      // Subscribe to Family Group Document
+      unsubscribe = subscribeToFamilyGroupDoc(
+        familyGroupCode,
+        (groupData) => {
+          if (groupData) {
+            isRemoteUpdate.current = true;
+            setFamilyGroup({
+              code: groupData.code,
+              familyName: groupData.familyName,
+              members: groupData.members || []
+            });
+
+            const records = groupData.healthRecords || {};
+            if (records.userProfile) setUserProfile(records.userProfile);
+            if (records.medications) setMedications(records.medications);
+            if (records.intakeHistory) setIntakeHistory(records.intakeHistory);
+            if (records.exams) setExams(records.exams);
+            if (records.appointments) setAppointments(records.appointments);
+            if (records.vitals) setVitals(records.vitals);
+
+            setSyncStatus('synced');
+            setTimeout(() => {
+              isRemoteUpdate.current = false;
+            }, 300);
+          }
+        },
+        (error) => {
+          console.error('[HealthContext] Family group sync error:', error);
+          setSyncStatus('error');
+        }
+      );
+    } else {
+      // Subscribe to Individual Patient Document (Using Auth UID if logged in)
+      unsubscribe = subscribeToPatientRecord(
+        authUser?.uid,
+        (remoteData) => {
+          if (remoteData) {
+            isRemoteUpdate.current = true;
+            if (remoteData.userProfile) setUserProfile(remoteData.userProfile);
+            if (remoteData.medications) setMedications(remoteData.medications);
+            if (remoteData.intakeHistory) setIntakeHistory(remoteData.intakeHistory);
+            if (remoteData.exams) setExams(remoteData.exams);
+            if (remoteData.appointments) setAppointments(remoteData.appointments);
+            if (remoteData.vitals) setVitals(remoteData.vitals);
+            setSyncStatus('synced');
+            setTimeout(() => {
+              isRemoteUpdate.current = false;
+            }, 300);
+          }
+        },
+        (error) => {
+          console.error('[HealthContext] Error in Firestore subscription:', error);
+          setSyncStatus('error');
+        }
+      );
+    }
+
+    return () => unsubscribe();
+  }, [familyGroupCode, authUser]);
+
+  // 2. Persist to Firebase Cloud Firestore on state modifications (Family Group or Individual UID)
   useEffect(() => {
     if (isFirebaseConfigured && !isRemoteUpdate.current) {
       setSyncStatus('syncing');
-      savePatientRecordToFirestore({
+
+      const healthPayload = {
         userProfile,
         medications,
         intakeHistory,
         exams,
         appointments,
         vitals
-      })
-        .then(() => setSyncStatus('synced'))
-        .catch(() => setSyncStatus('error'));
+      };
+
+      if (familyGroupCode) {
+        saveFamilyGroupHealthData(familyGroupCode, healthPayload)
+          .then(() => setSyncStatus('synced'))
+          .catch(() => setSyncStatus('error'));
+      } else {
+        savePatientRecordToFirestore(authUser?.uid, healthPayload)
+          .then(() => setSyncStatus('synced'))
+          .catch(() => setSyncStatus('error'));
+      }
     }
-  }, [userProfile, medications, intakeHistory, exams, appointments, vitals]);
+  }, [userProfile, medications, intakeHistory, exams, appointments, vitals, familyGroupCode, authUser]);
+
+  // Auth Handlers
+  const registerPatient = async (email, password, fullName) => {
+    try {
+      const user = await registerUserWithEmail(email, password, fullName);
+      setAuthUser(user);
+      if (fullName) {
+        setUserProfile((prev) => ({ ...prev, name: fullName }));
+      }
+      return user;
+    } catch (error) {
+      console.error('Error registering patient:', error);
+      throw error;
+    }
+  };
+
+  const loginPatient = async (email, password) => {
+    try {
+      const user = await loginUserWithEmail(email, password);
+      setAuthUser(user);
+      if (user.displayName) {
+        setUserProfile((prev) => ({ ...prev, name: user.displayName }));
+      }
+      return user;
+    } catch (error) {
+      console.error('Error logging in patient:', error);
+      throw error;
+    }
+  };
+
+  const logoutPatient = async () => {
+    try {
+      await logoutUser();
+      setAuthUser(null);
+    } catch (error) {
+      console.error('Error logging out patient:', error);
+    }
+  };
+
+  // Family Group Action Handlers
+  const createFamilyGroup = async (familyName, creatorName) => {
+    try {
+      const currentHealthPayload = {
+        userProfile,
+        medications,
+        intakeHistory,
+        exams,
+        appointments,
+        vitals
+      };
+
+      const result = await createFamilyGroupInFirestore(familyName, creatorName, currentHealthPayload);
+      setFamilyGroupCode(result.code);
+      setFamilyGroup(result);
+      try {
+        localStorage.setItem('app_health_family_code', result.code);
+      } catch (e) {}
+      return result;
+    } catch (error) {
+      console.error('Error creating family group:', error);
+      throw error;
+    }
+  };
+
+  const joinFamilyGroup = async (sixDigitCode, memberName) => {
+    try {
+      const result = await joinFamilyGroupInFirestore(sixDigitCode, memberName);
+      setFamilyGroupCode(result.code);
+      setFamilyGroup(result);
+      try {
+        localStorage.setItem('app_health_family_code', result.code);
+      } catch (e) {}
+      return result;
+    } catch (error) {
+      console.error('Error joining family group:', error);
+      throw error;
+    }
+  };
+
+  const leaveFamilyGroup = () => {
+    setFamilyGroupCode(null);
+    setFamilyGroup(null);
+    try {
+      localStorage.removeItem('app_health_family_code');
+    } catch (e) {}
+  };
 
   // Action Handler: Toggle Medication Taken/Pending
   const toggleMedicationStatus = (id) => {
@@ -469,9 +640,10 @@ export const HealthProvider = ({ children }) => {
 
   // Action Handler: Add New Appointment / Consultation
   const addAppointment = (newApp) => {
+    const doctorNameClean = newApp.doctor.trim();
     const appObj = {
       id: `app-${Date.now()}`,
-      doctor: newApp.doctor.startsWith('Dr.') || newApp.doctor.startsWith('Dra.') ? newApp.doctor : `Dr(a). ${newApp.doctor}`,
+      doctor: doctorNameClean.startsWith('Dr.') || doctorNameClean.startsWith('Dra.') ? doctorNameClean : `Dr(a). ${doctorNameClean}`,
       specialty: newApp.specialty || 'Consulta Geral',
       hospital: newApp.hospital || 'Clínica de Atendimento',
       dateText: newApp.dateText || 'Agendado',
@@ -480,7 +652,7 @@ export const HealthProvider = ({ children }) => {
       type: newApp.type || 'Atendimento presencial',
       insurance: newApp.insurance || (userProfile?.healthPlan?.name ? `Convênio ${userProfile.healthPlan.name}` : 'Particular / Convênio'),
       status: 'Agendado',
-      avatar: newApp.avatar || '/avatars/dr_carlos.jpg',
+      avatar: newApp.avatar || `https://api.dicebear.com/10.x/voxel-art/svg?seed=${encodeURIComponent(doctorNameClean)}`,
       address: newApp.address || newApp.hospital || 'Consulte os detalhes na recepção',
       isUpcoming: true
     };
@@ -545,6 +717,25 @@ export const HealthProvider = ({ children }) => {
     });
   };
 
+  // Action Handler: Add New Exam / Record Exam Date
+  const addExam = (newExam) => {
+    const examObj = {
+      id: `exam-${Date.now()}`,
+      title: newExam.title,
+      lab: newExam.lab || 'Laboratório / Hospital',
+      status: newExam.status || 'Agendado',
+      date: newExam.date,
+      summary: newExam.summary || 'Registro de exame cadastrado pelo paciente.',
+      preparationInstructions: newExam.preparationInstructions
+        ? newExam.preparationInstructions.split('\n').filter(Boolean)
+        : null,
+      type: newExam.type || 'lab',
+      pdfFile: newExam.pdfFile || null
+    };
+
+    setExams((prev) => [examObj, ...prev]);
+  };
+
   return (
     <HealthContext.Provider
       value={{
@@ -554,6 +745,15 @@ export const HealthProvider = ({ children }) => {
         setViewMode,
         syncStatus,
         isFirebaseConfigured,
+        authUser,
+        registerPatient,
+        loginPatient,
+        logoutPatient,
+        familyGroupCode,
+        familyGroup,
+        createFamilyGroup,
+        joinFamilyGroup,
+        leaveFamilyGroup,
         userProfile,
         updateProfile,
         updateProfileAvatar,
@@ -566,6 +766,7 @@ export const HealthProvider = ({ children }) => {
         addMedication,
         updateMedication,
         exams,
+        addExam,
         appointments,
         addAppointment,
         rescheduleAppointment,

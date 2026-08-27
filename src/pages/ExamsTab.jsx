@@ -1,43 +1,65 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
-import { FileText, Bell, Activity, ChevronRight } from 'lucide-react';
+import { FileText, Bell, Activity, Plus } from 'lucide-react';
 import { ExamPdfModal } from '../components/modals/ExamPdfModal';
 import { ExamPreparationModal } from '../components/modals/ExamPreparationModal';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
+import { AddExamModal } from '../components/modals/AddExamModal';
 
 export const ExamsTab = () => {
   const { exams } = useHealth();
   const [selectedExamPdf, setSelectedExamPdf] = useState(null);
   const [selectedPrepExam, setSelectedPrepExam] = useState(null);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="page-title">Exames e Laudos</h1>
           <p className="page-subtitle">Acompanhe seus resultados laboratoriais</p>
         </div>
-        <button
-          onClick={() => setIsNotifOpen(true)}
-          style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '50%',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #EBF1F0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#0F172A',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-          }}
-          aria-label="Notificações"
-        >
-          <Bell size={20} />
-        </button>
+
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="btn-primary"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              borderRadius: '12px'
+            }}
+          >
+            <Plus size={18} />
+            <span>Registrar Exame</span>
+          </button>
+
+          <button
+            onClick={() => setIsNotifOpen(true)}
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #EBF1F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#0F172A',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+            }}
+            aria-label="Notificações"
+          >
+            <Bell size={20} />
+          </button>
+        </div>
       </div>
 
       {/* List of Exams */}
@@ -146,6 +168,7 @@ export const ExamsTab = () => {
       </div>
 
       {/* Modals */}
+      <AddExamModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       <ExamPdfModal isOpen={!!selectedExamPdf} onClose={() => setSelectedExamPdf(null)} exam={selectedExamPdf} />
       <ExamPreparationModal isOpen={!!selectedPrepExam} onClose={() => setSelectedPrepExam(null)} exam={selectedPrepExam} />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />

@@ -1,5 +1,13 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile as updateFirebaseProfile
+} from 'firebase/auth';
 
 // Configuration from environment variables
 const firebaseConfig = {
@@ -22,12 +30,14 @@ export const isFirebaseConfigured = Boolean(
 
 let app = null;
 let db = null;
+let auth = null;
 
 if (isFirebaseConfigured) {
   try {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
-    console.log('[Firebase] Cloud Firestore initialized successfully.');
+    auth = getAuth(app);
+    console.log('[Firebase] Cloud Firestore & Firebase Auth initialized successfully.');
   } catch (error) {
     console.error('[Firebase] Initialization error:', error);
   }
@@ -37,19 +47,119 @@ if (isFirebaseConfigured) {
   );
 }
 
-export { app, db };
+export { app, db, auth };
 
 // Document reference for default patient health record
 const DEFAULT_PATIENT_DOC_ID = 'patient_mateus_ribeiro';
 const HEALTH_COLLECTION = 'healthRecords';
 
+// ---------------- FIREBASE AUTHENTICATION SERVICES ----------------
+
+/**
+ * Register a new user with Email & Password
+ */
+export const registerUserWithEmail = async (email, password, displayName) => {
+  if (!auth || !isFirebaseConfigured) {
+    return {
+      uid: 'mock_uid_' + Date.now(),
+      email,
+      displayName: displayName || email.split('@')[0]
+    };
+  }
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const user = userCredential.user;
+
+    if (displayName && displayName.trim()) {
+      await updateFirebaseProfile(user, { displayName: displayName.trim() });
+    }
+
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName || user.displayName || email.split('@')[0]
+    };
+  } catch (error) {
+    console.error('[Firebase Auth] Error registering user:', error);
+    throw error;
+  }
+};
+
+/**
+ * Login existing user with Email & Password
+ */
+export const loginUserWithEmail = async (email, password) => {
+  if (!auth || !isFirebaseConfigured) {
+    return {
+      uid: 'mock_uid_local',
+      email,
+      displayName: email.split('@')[0]
+    };
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+    const user = userCredential.user;
+
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || user.email.split('@')[0]
+    };
+  } catch (error) {
+    console.error('[Firebase Auth] Error logging in:', error);
+    throw error;
+  }
+};
+
+/**
+ * Logout current user
+ */
+export const logoutUser = async () => {
+  if (!auth || !isFirebaseConfigured) return true;
+
+  try {
+    await signOut(auth);
+    return true;
+  } catch (error) {
+    console.error('[Firebase Auth] Error logging out:', error);
+    throw error;
+  }
+};
+
+/**
+ * Subscribe to Auth State Changes
+ */
+export const subscribeToAuth = (onUserChanged) => {
+  if (!auth || !isFirebaseConfigured) {
+    onUserChanged(null);
+    return () => {};
+  }
+
+  return onAuthStateChanged(auth, (user) => {
+    if (user) {
+      onUserChanged({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0]
+      });
+    } else {
+      onUserChanged(null);
+    }
+  });
+};
+
+// ---------------- PATIENT HEALTH RECORD FIRESTORE SERVICES ----------------
+
 /**
  * Subscribe to real-time updates for patient health record in Firestore
  */
-export const subscribeToPatientRecord = (onDataChange, onError) => {
+export const subscribeToPatientRecord = (patientUid, onDataChange, onError) => {
   if (!db || !isFirebaseConfigured) return () => {};
 
-  const docRef = doc(db, HEALTH_COLLECTION, DEFAULT_PATIENT_DOC_ID);
+  const targetDocId = patientUid ? `patient_${patientUid}` : DEFAULT_PATIENT_DOC_ID;
+  const docRef = doc(db, HEALTH_COLLECTION, targetDocId);
   return onSnapshot(
     docRef,
     (snapshot) => {
@@ -69,18 +179,169 @@ export const subscribeToPatientRecord = (onDataChange, onError) => {
 /**
  * Save / Update patient record in Firestore
  */
-export const savePatientRecordToFirestore = async (healthData) => {
+export const savePatientRecordToFirestore = async (patientUid, healthData) => {
   if (!db || !isFirebaseConfigured) return false;
 
   try {
-    const docRef = doc(db, HEALTH_COLLECTION, DEFAULT_PATIENT_DOC_ID);
-    await setDoc(docRef, {
-      ...healthData,
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
+    const targetDocId = patientUid ? `patient_${patientUid}` : DEFAULT_PATIENT_DOC_ID;
+    const docRef = doc(db, HEALTH_COLLECTION, targetDocId);
+    await setDoc(
+      docRef,
+      {
+        ...healthData,
+        updatedAt: new Date().toISOString()
+      },
+      { merge: true }
+    );
     return true;
   } catch (error) {
     console.error('[Firebase] Error saving record to Firestore:', error);
     throw error;
   }
 };
+
+// ---------------- FAMILY GROUPS FIRESTORE SERVICES ----------------
+const FAMILY_COLLECTION = 'familyGroups';
+
+/**
+ * Generate a unique 6-digit numeric code
+ */
+export const generate6DigitCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+/**
+ * Create a new Family Group in Cloud Firestore with a 6-digit code
+ */
+export const createFamilyGroupInFirestore = async (familyName, creatorName, currentHealthData) => {
+  if (!db || !isFirebaseConfigured) {
+    const mockCode = generate6DigitCode();
+    return {
+      code: mockCode,
+      familyName,
+      members: [{ name: creatorName || 'Paciente', role: 'Criador' }]
+    };
+  }
+
+  try {
+    const code = generate6DigitCode();
+    const docRef = doc(db, FAMILY_COLLECTION, code);
+
+    const groupData = {
+      code,
+      familyName: familyName || 'Grupo Familiar',
+      createdAt: new Date().toISOString(),
+      creatorName: creatorName || 'Paciente',
+      members: [
+        {
+          name: creatorName || 'Paciente',
+          role: 'Criador / Administrador',
+          joinedAt: new Date().toISOString()
+        }
+      ],
+      healthRecords: currentHealthData || {}
+    };
+
+    await setDoc(docRef, groupData);
+    console.log(`[Firebase] Family Group created with 6-digit code: ${code}`);
+    return groupData;
+  } catch (error) {
+    console.error('[Firebase] Error creating family group:', error);
+    throw error;
+  }
+};
+
+/**
+ * Join an existing Family Group using the 6-digit code
+ */
+export const joinFamilyGroupInFirestore = async (sixDigitCode, memberName) => {
+  const codeClean = String(sixDigitCode).trim();
+  if (!db || !isFirebaseConfigured) {
+    return {
+      code: codeClean,
+      familyName: 'Família Conectada',
+      members: [{ name: memberName || 'Membro', role: 'Membro' }]
+    };
+  }
+
+  try {
+    const docRef = doc(db, FAMILY_COLLECTION, codeClean);
+    const snap = await getDoc(docRef);
+
+    if (!snap.exists()) {
+      throw new Error('Código de 6 dígitos não encontrado. Verifique com o administrador da família.');
+    }
+
+    const data = snap.data();
+    const existingMembers = data.members || [];
+    const newMemberName = memberName.trim() || 'Membro da Família';
+
+    const isAlreadyMember = existingMembers.some(
+      (m) => m.name.toLowerCase() === newMemberName.toLowerCase()
+    );
+
+    let updatedMembers = existingMembers;
+    if (!isAlreadyMember) {
+      updatedMembers = [
+        ...existingMembers,
+        { name: newMemberName, role: 'Membro', joinedAt: new Date().toISOString() }
+      ];
+      await setDoc(docRef, { members: updatedMembers }, { merge: true });
+    }
+
+    return {
+      ...data,
+      members: updatedMembers
+    };
+  } catch (error) {
+    console.error('[Firebase] Error joining family group:', error);
+    throw error;
+  }
+};
+
+/**
+ * Subscribe to real-time updates of a Family Group
+ */
+export const subscribeToFamilyGroupDoc = (sixDigitCode, onDataChange, onError) => {
+  if (!db || !isFirebaseConfigured || !sixDigitCode) return () => {};
+
+  const docRef = doc(db, FAMILY_COLLECTION, String(sixDigitCode).trim());
+  return onSnapshot(
+    docRef,
+    (snapshot) => {
+      if (snapshot.exists()) {
+        onDataChange(snapshot.data());
+      } else {
+        onDataChange(null);
+      }
+    },
+    (error) => {
+      console.error('[Firebase] Family group subscription error:', error);
+      if (onError) onError(error);
+    }
+  );
+};
+
+/**
+ * Save / Update health data inside a Family Group
+ */
+export const saveFamilyGroupHealthData = async (sixDigitCode, healthData) => {
+  if (!db || !isFirebaseConfigured || !sixDigitCode) return false;
+
+  try {
+    const docRef = doc(db, FAMILY_COLLECTION, String(sixDigitCode).trim());
+    await setDoc(
+      docRef,
+      {
+        healthRecords: healthData,
+        updatedAt: new Date().toISOString()
+      },
+      { merge: true }
+    );
+    return true;
+  } catch (error) {
+    console.error('[Firebase] Error updating family group health data:', error);
+    throw error;
+  }
+};
+

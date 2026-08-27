@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
-import { Pill, Activity, Heart, Calendar, ChevronRight } from 'lucide-react';
+import { Pill, Activity, Heart, Calendar, ChevronRight, Users } from 'lucide-react';
 import { DirectionsModal } from '../components/modals/DirectionsModal';
+import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
 
 export const HomeTab = () => {
-  const { userProfile, appointments, medications, vitals, setActiveTab, toggleMedicationStatus } = useHealth();
+  const { userProfile, appointments, medications, vitals, setActiveTab, toggleMedicationStatus, familyGroupCode, familyGroup } = useHealth();
   const [selectedApp, setSelectedApp] = useState(null);
   const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
+  const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
 
   // Next Appointment (Dr. Alexandre Santos)
   const nextAppointment = appointments.find((app) => app.isUpcoming) || appointments[0];
@@ -19,9 +21,32 @@ export const HomeTab = () => {
       {/* Top Profile Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div>
-          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px' }}>
-            Olá, {userProfile.name}
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px' }}>
+              Olá, {userProfile.name}
+            </h1>
+
+            <button
+              onClick={() => setIsFamilyModalOpen(true)}
+              style={{
+                background: familyGroupCode ? '#E6F5F2' : '#F1F5F9',
+                color: familyGroupCode ? '#0D6C5D' : '#475569',
+                border: 'none',
+                borderRadius: '100px',
+                padding: '5px 12px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+              }}
+            >
+              <Users size={14} />
+              <span>{familyGroupCode ? `${familyGroup?.familyName || 'Família'} (${familyGroupCode})` : '+ Grupo Familiar'}</span>
+            </button>
+          </div>
           <p style={{ fontSize: '14px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
             {userProfile.greeting}
           </p>
@@ -235,7 +260,7 @@ export const HomeTab = () => {
         </div>
       </div>
 
-      {/* Location / Details Modal */}
+      {/* Location / Details Modal & Family Group Modal */}
       {selectedApp && (
         <DirectionsModal
           isOpen={isDirectionsOpen}
@@ -243,6 +268,10 @@ export const HomeTab = () => {
           appointment={selectedApp}
         />
       )}
+      <FamilyGroupModal
+        isOpen={isFamilyModalOpen}
+        onClose={() => setIsFamilyModalOpen(false)}
+      />
     </div>
   );
 };

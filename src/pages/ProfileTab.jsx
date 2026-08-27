@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
-import { Settings, Phone, Camera, Sparkles, Edit3 } from 'lucide-react';
+import { Settings, Phone, Camera, Sparkles, Edit3, Users, KeyRound, ArrowRight, ShieldCheck, LogIn, LogOut } from 'lucide-react';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
 import { EditProfileModal } from '../components/modals/EditProfileModal';
+import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
+import { AuthModal } from '../components/modals/AuthModal';
 
 export const ProfileTab = () => {
-  const { userProfile } = useHealth();
+  const { userProfile, familyGroupCode, familyGroup, authUser, logoutPatient } = useHealth();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authInitialTab, setAuthInitialTab] = useState('login');
+
+  const openAuth = (tabName = 'login') => {
+    setAuthInitialTab(tabName);
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -62,7 +72,7 @@ export const ProfileTab = () => {
       <div className="grid-responsive-2">
         {/* Left Column: Main Profile Card & Emergency Contact */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Main Profile Card (Matches Figma Screenshot exactly) */}
+          {/* Main Profile Card */}
           <div className="card" style={{ padding: '20px', borderRadius: '20px' }}>
             {/* User Info Row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -97,7 +107,7 @@ export const ProfileTab = () => {
                     cursor: 'pointer',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
                   }}
-                  title="Editar Perfil e Avatar via API"
+                  title="Editar Perfil"
                 >
                   <Camera size={13} />
                 </button>
@@ -165,6 +175,59 @@ export const ProfileTab = () => {
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* Card: GRUPO FAMILIAR (Destaque Principal) */}
+          <div
+            className="card"
+            style={{
+              padding: '20px',
+              borderRadius: '20px',
+              border: familyGroupCode ? '2px solid #0D6C5D' : '1px solid #E2E8F0',
+              background: familyGroupCode ? '#F4FBF9' : '#FFFFFF'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#E6F5F2', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0D6C5D' }}>
+                  <Users size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                    {familyGroupCode ? (familyGroup?.familyName || 'Grupo Familiar') : 'Grupo Familiar Compartilhado'}
+                  </h3>
+                  <span style={{ fontSize: '12px', color: familyGroupCode ? '#0D6C5D' : '#64748B', fontWeight: 600 }}>
+                    {familyGroupCode ? `Conectado • Código: ${familyGroupCode}` : 'Acesso a consultas e exames da família'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsFamilyModalOpen(true)}
+                style={{
+                  backgroundColor: '#0D6C5D',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                {familyGroupCode ? 'Gerenciar' : 'Entrar / Criar'}
+                <ArrowRight size={14} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.4, margin: '8px 0 0 0' }}>
+              {familyGroupCode
+                ? `Você está sincronizado com ${familyGroup?.members?.length || 1} membro(s) no Firebase usando o código de 6 dígitos.`
+                : 'Conecte sua família usando um código exclusivo de 6 dígitos para sincronizar exames, remédios e consultas.'}
+            </p>
           </div>
 
           {/* Card: CONTATOS DE EMERGÊNCIA */}
@@ -277,11 +340,97 @@ export const ProfileTab = () => {
               </div>
             </div>
           </div>
+
+          {/* Card: CONTA DO PACIENTE (FIREBASE AUTH) */}
+          <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
+            <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
+              CONTA & SEGURANÇA (FIREBASE AUTH)
+            </h3>
+
+            {authUser ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ShieldCheck size={18} style={{ color: '#0D6C5D' }} /> {authUser.displayName || 'Paciente Autenticado'}
+                  </h4>
+                  <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
+                    {authUser.email}
+                  </p>
+                </div>
+
+                <button
+                  onClick={logoutPatient}
+                  style={{
+                    backgroundColor: '#FEE2E2',
+                    color: '#991B1B',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <LogOut size={14} /> Sair
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                    Modo Local / Não Logado
+                  </h4>
+                  <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
+                    Cadastre-se com e-mail e senha para salvar na nuvem.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => openAuth('login')}
+                    style={{
+                      backgroundColor: '#E6F5F2',
+                      color: '#0D6C5D',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '8px 12px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Entrar
+                  </button>
+
+                  <button
+                    onClick={() => openAuth('register')}
+                    style={{
+                      backgroundColor: '#0D6C5D',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '8px 12px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cadastrar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Modals */}
       <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} />
+      <FamilyGroupModal isOpen={isFamilyModalOpen} onClose={() => setIsFamilyModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialTab={authInitialTab} />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
     </div>
   );

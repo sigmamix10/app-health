@@ -17,15 +17,22 @@ export const AddAppointmentModal = ({ isOpen, onClose }) => {
   const [time, setTime] = useState('10:00');
   const [type, setType] = useState('Atendimento presencial');
   const [insurance, setInsurance] = useState(() => userProfile?.healthPlan?.name || 'Bradesco Saúde');
-  const [selectedAvatar, setSelectedAvatar] = useState('/avatars/dr_alexandre.jpg');
+  const [selectedAvatar, setSelectedAvatar] = useState('https://api.dicebear.com/10.x/voxel-art/svg?seed=Alexandre');
+  const [customAvatarUrl, setCustomAvatarUrl] = useState('');
 
   if (!isOpen) return null;
 
   const doctorAvatars = [
-    { label: 'Dr. Alexandre', url: '/avatars/dr_alexandre.jpg' },
-    { label: 'Dra. Beatriz', url: '/avatars/dra_beatriz.jpg' },
-    { label: 'Dr. Carlos', url: '/avatars/dr_carlos.jpg' }
+    { label: 'Alexandre', url: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Alexandre' },
+    { label: 'Beatriz', url: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Beatriz' },
+    { label: 'Carlos', url: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Carlos' },
+    { label: 'Patrícia', url: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Patricia' },
+    { label: 'Marcelo', url: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Marcelo' },
+    { label: 'Juliana', url: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Juliana' }
   ];
+
+  // Dynamic Voxel-Art generator based on the doctor name if no specific avatar chosen
+  const activeAvatar = customAvatarUrl.trim() || selectedAvatar || (doctor.trim() ? `https://api.dicebear.com/10.x/voxel-art/svg?seed=${encodeURIComponent(doctor.trim())}` : 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Doctor');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,13 +57,14 @@ export const AddAppointmentModal = ({ isOpen, onClose }) => {
       timeText: time,
       type,
       insurance: insurance ? `Convênio ${insurance}` : 'Particular',
-      avatar: selectedAvatar
+      avatar: activeAvatar
     });
 
     // Reset fields & close
     setDoctor('');
     setHospital('');
     setAddress('');
+    setCustomAvatarUrl('');
     onClose();
   };
 
@@ -201,27 +209,76 @@ export const AddAppointmentModal = ({ isOpen, onClose }) => {
             />
           </div>
 
-          {/* Avatar Selecionável */}
+          {/* Seleção do Avatar do Médico */}
           <div className="form-group">
-            <label className="form-label">Selecione o Ícone / Foto do Médico</label>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              {doctorAvatars.map((av) => (
-                <img
-                  key={av.url}
-                  src={av.url}
-                  alt={av.label}
-                  onClick={() => setSelectedAvatar(av.url)}
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: selectedAvatar === av.url ? '3px solid #0D6C5D' : '2px solid #E2E8F0',
-                    cursor: 'pointer',
-                    opacity: selectedAvatar === av.url ? 1 : 0.6
-                  }}
-                />
-              ))}
+            <label className="form-label">Escolha o Avatar Voxel-Art do Médico(a)</label>
+
+            {/* Galeria de Avatares Voxel-Art da API DiceBear */}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              {doctorAvatars.map((av) => {
+                const isSelected = activeAvatar === av.url;
+                return (
+                  <div
+                    key={av.url}
+                    onClick={() => {
+                      setSelectedAvatar(av.url);
+                      setCustomAvatarUrl('');
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '52px',
+                        height: '52px',
+                        borderRadius: '50%',
+                        backgroundColor: isSelected ? '#E6F5F2' : '#F8FAFC',
+                        border: isSelected ? '3px solid #0D6C5D' : '2px solid #E2E8F0',
+                        boxShadow: isSelected ? '0 0 0 3px rgba(13, 108, 93, 0.15)' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        transition: 'all 0.2s ease',
+                        padding: '4px'
+                      }}
+                    >
+                      <img
+                        src={av.url}
+                        alt={av.label}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain'
+                        }}
+                      />
+                    </div>
+                    <span style={{ fontSize: '11px', color: isSelected ? '#0D6C5D' : '#64748B', fontWeight: isSelected ? 700 : 500 }}>
+                      {av.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Input de URL Personalizada */}
+            <div style={{ marginTop: '4px' }}>
+              <label style={{ fontSize: '12px', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                Ou cole a URL de uma foto da internet:
+              </label>
+              <input
+                type="url"
+                className="form-input"
+                placeholder="https://exemplo.com/foto_do_medico.jpg"
+                value={customAvatarUrl}
+                onChange={(e) => setCustomAvatarUrl(e.target.value)}
+                style={{ fontSize: '13px' }}
+              />
             </div>
           </div>
 
