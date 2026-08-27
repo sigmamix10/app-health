@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
 import { BottomNav } from './BottomNav';
 import { Wifi, Battery, Signal, Activity, Home, Pill, FileText, Calendar, User, Monitor, Cloud, CloudOff } from 'lucide-react';
+import { AuthModal } from './modals/AuthModal';
 
 export const MobileFrame = ({ children }) => {
   const { viewMode, setViewMode, activeTab, setActiveTab, userProfile, syncStatus, isFirebaseConfigured, authUser } = useHealth();
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Início', icon: Home },
@@ -43,7 +45,7 @@ export const MobileFrame = ({ children }) => {
           {/* Sticky Desktop Top Navigation Header */}
           <header className="desktop-header">
             <div className="desktop-header-inner">
-              <div className="desktop-logo" onClick={() => setActiveTab('home')}>
+              <div className="desktop-logo" onClick={() => setActiveTab('landing')}>
                 <div
                   style={{
                     width: '38px',
@@ -100,16 +102,17 @@ export const MobileFrame = ({ children }) => {
                   </span>
                 ) : (
                   <button
-                    onClick={() => setActiveTab('profile')}
+                    onClick={() => setIsAuthOpen(true)}
                     style={{
                       fontSize: '12px',
                       fontWeight: 700,
-                      color: '#0D6C5D',
-                      background: '#E6F5F2',
+                      color: '#FFFFFF',
+                      background: '#0D6C5D',
                       border: 'none',
-                      padding: '6px 12px',
+                      padding: '6px 14px',
                       borderRadius: '100px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(13, 108, 93, 0.2)'
                     }}
                   >
                     Entrar / Cadastrar
@@ -176,6 +179,9 @@ export const MobileFrame = ({ children }) => {
           </div>
         </div>
       )}
+
+      {/* Global Auth Modal Trigger */}
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </div>
   );
 };

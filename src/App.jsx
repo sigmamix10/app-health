@@ -7,12 +7,15 @@ import { ExamsTab } from './pages/ExamsTab';
 import { ConsultationsTab } from './pages/ConsultationsTab';
 import { VitalsTab } from './pages/VitalsTab';
 import { ProfileTab } from './pages/ProfileTab';
+import { LandingPage } from './pages/LandingPage';
 import './styles/global.css';
 
 const ScreenRouter = () => {
   const { activeTab } = useHealth();
 
   switch (activeTab) {
+    case 'landing':
+      return <LandingPage />;
     case 'home':
       return <HomeTab />;
     case 'medications':
