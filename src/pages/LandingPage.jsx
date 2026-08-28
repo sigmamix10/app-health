@@ -1,7 +1,40 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
 import { AuthModal } from '../components/modals/AuthModal';
-import { X, ShieldCheck, FileText } from 'lucide-react';
+import { X, ShieldCheck, FileText, ChevronDown, ChevronUp, Info, HelpCircle, Pill, Users, BookOpen } from 'lucide-react';
+
+const FaqItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: '16px',
+        border: '1px solid #E2E8F0',
+        padding: '14px 16px',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease'
+      }}
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+        <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.3 }}>
+          {question}
+        </h4>
+        <div style={{ color: '#0D6C5D', flexShrink: 0 }}>
+          {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </div>
+      </div>
+
+      {isOpen && (
+        <p style={{ fontSize: '12.5px', color: '#475569', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #F1F5F9', lineHeight: 1.5, margin: '10px 0 0 0' }}>
+          {answer}
+        </p>
+      )}
+    </div>
+  );
+};
 
 export const LandingPage = ({ onContinueAsGuest }) => {
   const { setActiveTab } = useHealth();
@@ -252,7 +285,7 @@ export const LandingPage = ({ onContinueAsGuest }) => {
         </p>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '340px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '360px' }}>
           {/* Primary Action Button: Entrar */}
           <button
             onClick={() => handleOpenAuth('login')}
@@ -271,7 +304,7 @@ export const LandingPage = ({ onContinueAsGuest }) => {
               width: '100%'
             }}
           >
-            Entrar
+            Entrar no Aplicativo
           </button>
 
           {/* Secondary Action Button: Criar Conta Grátis */}
@@ -287,17 +320,117 @@ export const LandingPage = ({ onContinueAsGuest }) => {
               fontWeight: 700,
               cursor: 'pointer',
               boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)',
-              transition: 'background-color 0.15s ease',
               textAlign: 'center',
               width: '100%'
             }}
           >
             Criar Conta Grátis
           </button>
+
+          {/* Patient User Guide Button */}
+          <button
+            onClick={() => setActiveTab('guide')}
+            style={{
+              backgroundColor: '#E6F5F2',
+              color: '#0D6C5D',
+              border: '1px solid #BCE5DC',
+              borderRadius: '16px',
+              padding: '12px 20px',
+              fontSize: '14px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              width: '100%'
+            }}
+          >
+            <BookOpen size={18} /> Guia de Uso do Paciente
+          </button>
+        </div>
+
+        {/* Quick Guest Link so user can explore app freely */}
+        <button
+          onClick={handleGuest}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#64748B',
+            fontSize: '12px',
+            cursor: 'pointer',
+            marginTop: '12px',
+            marginBottom: '24px',
+            fontWeight: 600
+          }}
+        >
+          (Explorar modo de demonstração)
+        </button>
+
+        {/* ---------------- SEÇÃO DE INFORMAÇÕES DO APLICATIVO ---------------- */}
+        <div style={{ width: '100%', maxWidth: '380px', marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <Info size={18} style={{ color: '#0D6C5D' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              Recursos Principais
+            </h3>
+          </div>
+
+          <div className="grid-responsive-2" style={{ gap: '10px' }}>
+            <div style={{ background: '#FFFFFF', padding: '14px', borderRadius: '16px', border: '1px solid #EBF1F0' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                <Pill size={18} />
+              </div>
+              <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>Medicamentos Flexíveis</h4>
+              <p style={{ fontSize: '12px', color: '#64748B', marginTop: '4px', lineHeight: 1.4 }}>
+                Agende dias específicos (ex: Domingos ou Seg/Qua/Sex) e dias alternados com alerta de estoque.
+              </p>
+            </div>
+
+            <div style={{ background: '#FFFFFF', padding: '14px', borderRadius: '16px', border: '1px solid #EBF1F0' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#E6F5F2', color: '#0D6C5D', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                <Users size={18} />
+              </div>
+              <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>Grupo Familiar PIN</h4>
+              <p style={{ fontSize: '12px', color: '#64748B', marginTop: '4px', lineHeight: 1.4 }}>
+                Código de 6 dígitos para compartilhar e acompanhar dados de parentes em tempo real.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ---------------- SEÇÃO DE FAQ (PERGUNTAS FREQUENTES) ---------------- */}
+        <div style={{ width: '100%', maxWidth: '380px', marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <HelpCircle size={18} style={{ color: '#0D6C5D' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              Perguntas Frequentes (FAQ)
+            </h3>
+          </div>
+
+          <FaqItem
+            question="Como agendar remédios que tomo apenas em dias específicos?"
+            answer="No formulário de cadastro de medicamento, escolha 'Dias Específicos' no padrão de frequência e marque os dias da semana desejados (ex: marcaremos apenas [Dom] para tomar todo domingo)."
+          />
+
+          <FaqItem
+            question="Como funciona o Grupo Familiar de 6 dígitos?"
+            answer="Um membro cria o grupo no aplicativo e gera um código numérico de 6 dígitos. Os demais parentes digitam esse código para conectar os celulares e acompanhar remédios e consultas em tempo real."
+          />
+
+          <FaqItem
+            question="Como ativar o leitor de voz e aumentar a letra do aplicativo?"
+            answer="Acesse 'Meu Perfil' > 'Acessibilidade (a11y)' para escolher fontes maiores (+12% ou +25%), ativar o modo alto contraste ou clicar em 'Ouvir Resumo' para sintetizar a leitura em áudio."
+          />
+
+          <FaqItem
+            question="O aplicativo é gratuito? Meus dados ficam salvos na nuvem?"
+            answer="Sim! O Health App é gratuito. Ao criar sua conta com e-mail e senha, seus prontuários e medicamentos são salvos na nuvem criptografada do Firebase."
+          />
         </div>
 
         {/* Terms of Use Footer Link */}
-        <p style={{ fontSize: '12px', color: '#94A3B8', textAlign: 'center', marginTop: '22px', marginBottom: '6px' }}>
+        <p style={{ fontSize: '12px', color: '#94A3B8', textAlign: 'center', marginTop: '24px', marginBottom: '6px' }}>
           Ao continuar, você concorda com nossos{' '}
           <button
             onClick={() => setIsTermsOpen(true)}
@@ -315,22 +448,6 @@ export const LandingPage = ({ onContinueAsGuest }) => {
             Termos de Uso
           </button>
         </p>
-
-        {/* Quick Guest Link so user can explore app freely */}
-        <button
-          onClick={handleGuest}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#94A3B8',
-            fontSize: '11px',
-            cursor: 'pointer',
-            marginBottom: '12px',
-            textDecoration: 'none'
-          }}
-        >
-          (Explorar no Modo Convidado)
-        </button>
 
         {/* iOS Home Indicator Bar */}
         <div

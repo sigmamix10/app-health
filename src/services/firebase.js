@@ -250,32 +250,38 @@ export const generate6DigitCode = () => {
  * Create a new Family Group in Cloud Firestore with a 6-digit code
  */
 export const createFamilyGroupInFirestore = async (familyName, creatorName, currentHealthData) => {
+  const creatorClean = creatorName || 'Paciente';
   if (!db || !isFirebaseConfigured) {
     const mockCode = generate6DigitCode();
     return {
       code: mockCode,
-      familyName,
-      members: [{ name: creatorName || 'Paciente', role: 'Criador' }]
+      familyName: familyName || 'Grupo Familiar',
+      members: [{ name: creatorClean, role: 'Criador' }],
+      membersHealthData: { [creatorClean]: currentHealthData || {} }
     };
   }
 
   try {
     const code = generate6DigitCode();
     const docRef = doc(db, FAMILY_COLLECTION, code);
+    const cleanHealth = sanitizeForFirestore(currentHealthData || {});
 
     const groupData = {
       code,
       familyName: familyName || 'Grupo Familiar',
       createdAt: new Date().toISOString(),
-      creatorName: creatorName || 'Paciente',
+      creatorName: creatorClean,
       members: [
         {
-          name: creatorName || 'Paciente',
+          name: creatorClean,
           role: 'Criador / Administrador',
           joinedAt: new Date().toISOString()
         }
       ],
-      healthRecords: currentHealthData || {}
+      healthRecords: cleanHealth,
+      membersHealthData: {
+        [creatorClean]: cleanHealth
+      }
     };
 
     await setDoc(docRef, groupData);
@@ -359,19 +365,21 @@ export const subscribeToFamilyGroupDoc = (sixDigitCode, onDataChange, onError) =
 };
 
 /**
- * Save / Update health data inside a Family Group
+ * Save / Update health data for a specific member inside a Family Group
  */
-export const saveFamilyGroupHealthData = async (sixDigitCode, healthData) => {
+export const saveFamilyGroupHealthData = async (sixDigitCode, memberName, healthData) => {
   if (!db || !isFirebaseConfigured || !sixDigitCode) return false;
 
   try {
     const docRef = doc(db, FAMILY_COLLECTION, String(sixDigitCode).trim());
     const cleanPayload = sanitizeForFirestore(healthData);
+    const memberKey = memberName || 'Paciente';
 
     await setDoc(
       docRef,
       {
         healthRecords: cleanPayload,
+        [`membersHealthData.${memberKey}`]: cleanPayload,
         updatedAt: new Date().toISOString()
       },
       { merge: true }

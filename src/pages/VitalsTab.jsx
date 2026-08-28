@@ -3,23 +3,26 @@ import { useHealth } from '../context/HealthContext';
 import { Activity, Heart, Bell, TrendingUp, Scale, Droplet, Plus } from 'lucide-react';
 import { AddVitalModal } from '../components/modals/AddVitalModal';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
+import { MemberSelectorBar } from '../components/common/MemberSelectorBar';
+import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
 
 export const VitalsTab = () => {
-  const { vitals } = useHealth();
+  const { vitals, userProfile } = useHealth();
   const [isAddVitalOpen, setIsAddVitalOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isFamilyOpen, setIsFamilyOpen] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
   // SVG Chart calculation parameters for 7-day history
   const chartWidth = 300;
   const chartHeight = 80;
-  const history = vitals.history7Days;
+  const history = vitals.history7Days || [];
 
   const minVal = 110;
   const maxVal = 130;
 
   const points = history.map((item, index) => {
-    const x = (index / (history.length - 1)) * (chartWidth - 20) + 10;
+    const x = (index / Math.max(1, history.length - 1)) * (chartWidth - 20) + 10;
     const y = chartHeight - ((item.systolic - minVal) / (maxVal - minVal)) * (chartHeight - 20) - 10;
     return { x, y, day: item.day, val: item.systolic, diastolic: item.diastolic };
   });
@@ -30,10 +33,16 @@ export const VitalsTab = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Family Group Member Selector Bar */}
+      <MemberSelectorBar
+        onOpenFamilyModal={() => setIsFamilyOpen(true)}
+        onAddMember={() => setIsFamilyOpen(true)}
+      />
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 className="page-title">Sinais Vitais</h1>
+          <h1 className="page-title">Sinais Vitais • {userProfile?.name}</h1>
           <p className="page-subtitle">Gráficos e histórico de monitoramento</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -247,6 +256,7 @@ export const VitalsTab = () => {
       {/* Modals */}
       <AddVitalModal isOpen={isAddVitalOpen} onClose={() => setIsAddVitalOpen(false)} />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+      <FamilyGroupModal isOpen={isFamilyOpen} onClose={() => setIsFamilyOpen(false)} />
     </div>
   );
 };

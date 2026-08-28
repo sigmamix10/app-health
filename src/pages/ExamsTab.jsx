@@ -5,21 +5,30 @@ import { ExamPdfModal } from '../components/modals/ExamPdfModal';
 import { ExamPreparationModal } from '../components/modals/ExamPreparationModal';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
 import { AddExamModal } from '../components/modals/AddExamModal';
+import { MemberSelectorBar } from '../components/common/MemberSelectorBar';
+import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
 
 export const ExamsTab = () => {
-  const { exams } = useHealth();
+  const { exams, userProfile } = useHealth();
   const [selectedExamPdf, setSelectedExamPdf] = useState(null);
   const [selectedPrepExam, setSelectedPrepExam] = useState(null);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isFamilyOpen, setIsFamilyOpen] = useState(false);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Family Group Member Selector Bar */}
+      <MemberSelectorBar
+        onOpenFamilyModal={() => setIsFamilyOpen(true)}
+        onAddMember={() => setIsFamilyOpen(true)}
+      />
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="page-title">Exames e Laudos</h1>
-          <p className="page-subtitle">Acompanhe seus resultados laboratoriais</p>
+          <h1 className="page-title">Exames • {userProfile?.name}</h1>
+          <p className="page-subtitle">Acompanhe resultados laboratoriais e de imagem</p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -192,6 +201,7 @@ export const ExamsTab = () => {
       <ExamPdfModal isOpen={!!selectedExamPdf} onClose={() => setSelectedExamPdf(null)} exam={selectedExamPdf} />
       <ExamPreparationModal isOpen={!!selectedPrepExam} onClose={() => setSelectedPrepExam(null)} exam={selectedPrepExam} />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+      <FamilyGroupModal isOpen={isFamilyOpen} onClose={() => setIsFamilyOpen(false)} />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useHealth } from '../context/HealthContext';
 import { Pill, Activity, Heart, Calendar, ChevronRight, Users, Volume2, VolumeX } from 'lucide-react';
 import { DirectionsModal } from '../components/modals/DirectionsModal';
 import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
+import { MemberSelectorBar } from '../components/common/MemberSelectorBar';
 
 export const HomeTab = () => {
   const {
@@ -14,6 +15,7 @@ export const HomeTab = () => {
     toggleMedicationStatus,
     familyGroupCode,
     familyGroup,
+    activeMemberName,
     speakText,
     isSpeaking,
     stopSpeech
@@ -43,7 +45,13 @@ export const HomeTab = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Family Group Member Selector Bar */}
+      <MemberSelectorBar
+        onOpenFamilyModal={() => setIsFamilyModalOpen(true)}
+        onAddMember={() => setIsFamilyModalOpen(true)}
+      />
+
       {/* Top Profile Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
         <div>

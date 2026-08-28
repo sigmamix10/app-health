@@ -15,6 +15,76 @@ import {
 
 const HealthContext = createContext();
 
+export const THEMES = {
+  emerald: {
+    id: 'emerald',
+    name: 'Verde Esmeralda',
+    primary: '#0D6C5D',
+    primaryDark: '#095448',
+    primaryLight: '#E6F5F2',
+    primaryHover: '#0B5D50'
+  },
+  ocean: {
+    id: 'ocean',
+    name: 'Azul Oceano',
+    primary: '#2563EB',
+    primaryDark: '#1D4ED8',
+    primaryLight: '#EFF6FF',
+    primaryHover: '#1E40AF'
+  },
+  violet: {
+    id: 'violet',
+    name: 'Violeta Elegante',
+    primary: '#7C3AED',
+    primaryDark: '#6D28D9',
+    primaryLight: '#F5F3FF',
+    primaryHover: '#5B21B6'
+  },
+  berry: {
+    id: 'berry',
+    name: 'Rosa Amora',
+    primary: '#DB2777',
+    primaryDark: '#BE185D',
+    primaryLight: '#FDF2F8',
+    primaryHover: '#9D174D'
+  },
+  terracotta: {
+    id: 'terracotta',
+    name: 'Laranja Terracota',
+    primary: '#EA580C',
+    primaryDark: '#C2410C',
+    primaryLight: '#FFF7ED',
+    primaryHover: '#9A3412'
+  },
+  dark: {
+    id: 'dark',
+    name: 'Modo Escuro',
+    primary: '#38BDF8',
+    primaryDark: '#0284C7',
+    primaryLight: '#0F172A',
+    primaryHover: '#0369A1'
+  }
+};
+
+export const applyTheme = (themeId) => {
+  const t = THEMES[themeId] || THEMES.emerald;
+  const root = document.documentElement;
+  root.style.setProperty('--primary', t.primary);
+  root.style.setProperty('--primary-dark', t.primaryDark);
+  root.style.setProperty('--primary-light', t.primaryLight);
+  root.style.setProperty('--primary-hover', t.primaryHover);
+
+  if (themeId === 'dark') {
+    document.body.classList.add('high-contrast');
+  } else {
+    document.body.classList.remove('high-contrast');
+  }
+
+  try {
+    localStorage.setItem('app_health_theme', themeId);
+  } catch (e) {}
+};
+
 export const HealthProvider = ({ children }) => {
   // Active Tab: 'landing' (Inicial) | 'home' | 'medications' | 'exams' | 'consultations' | 'profile' | 'vitals'
   const [activeTab, setActiveTab] = useState('landing');
@@ -24,10 +94,41 @@ export const HealthProvider = ({ children }) => {
   // Firebase Auth State
   const [authUser, setAuthUser] = useState(null);
 
-  // Accessibility (a11y) States
+  // Theme & Accessibility (a11y) States
+  const [themeColor, setThemeColor] = useState(() => {
+    try {
+      return localStorage.getItem('app_health_theme') || 'emerald';
+    } catch (e) {
+      return 'emerald';
+    }
+  });
+
+  useEffect(() => {
+    applyTheme(themeColor);
+  }, [themeColor]);
+
+  const changeThemeColor = (newTheme) => {
+    setThemeColor(newTheme);
+    applyTheme(newTheme);
+  };
+
   const [fontScale, setFontScale] = useState('normal'); // 'normal' | 'large' | 'xlarge'
   const [highContrast, setHighContrast] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Apply Accessibility (a11y) CSS classes to document.body
+  useEffect(() => {
+    const body = document.body;
+    body.classList.remove('font-scale-large', 'font-scale-xlarge');
+    if (fontScale === 'large') body.classList.add('font-scale-large');
+    if (fontScale === 'xlarge') body.classList.add('font-scale-xlarge');
+
+    if (highContrast) {
+      body.classList.add('high-contrast');
+    } else if (themeColor !== 'dark') {
+      body.classList.remove('high-contrast');
+    }
+  }, [fontScale, highContrast, themeColor]);
 
   const speakText = (text) => {
     if ('speechSynthesis' in window && text) {
@@ -49,7 +150,7 @@ export const HealthProvider = ({ children }) => {
     }
   };
 
-  // Family Group State (6-digit code persistence)
+  // Family Group State (6-digit code persistence & Multi-Member Selection)
   const [familyGroupCode, setFamilyGroupCode] = useState(() => {
     try {
       return localStorage.getItem('app_health_family_code') || null;
@@ -58,6 +159,8 @@ export const HealthProvider = ({ children }) => {
     }
   });
   const [familyGroup, setFamilyGroup] = useState(null);
+  const [activeMemberName, setActiveMemberName] = useState(null);
+  const [familyMembersHealthData, setFamilyMembersHealthData] = useState({});
 
   // Cloud Sync Status: 'synced' | 'syncing' | 'error' | 'disconnected'
   const [syncStatus, setSyncStatus] = useState(isFirebaseConfigured ? 'synced' : 'disconnected');
@@ -452,13 +555,21 @@ export const HealthProvider = ({ children }) => {
               members: groupData.members || []
             });
 
-            const records = groupData.healthRecords || {};
-            if (records.userProfile) setUserProfile(records.userProfile);
-            if (records.medications) setMedications(records.medications);
-            if (records.intakeHistory) setIntakeHistory(records.intakeHistory);
-            if (records.exams) setExams(records.exams);
-            if (records.appointments) setAppointments(records.appointments);
-            if (records.vitals) setVitals(records.vitals);
+            const membersMap = groupData.membersHealthData || {};
+            setFamilyMembersHealthData(membersMap);
+
+            const currentMemberKey = activeMemberName || groupData.creatorName || (groupData.members && groupData.members[0]?.name) || userProfile.name;
+            if (!activeMemberName) {
+              setActiveMemberName(currentMemberKey);
+            }
+
+            const targetRecords = membersMap[currentMemberKey] || groupData.healthRecords || {};
+            if (targetRecords.userProfile) setUserProfile(targetRecords.userProfile);
+            if (targetRecords.medications) setMedications(targetRecords.medications);
+            if (targetRecords.intakeHistory) setIntakeHistory(targetRecords.intakeHistory);
+            if (targetRecords.exams) setExams(targetRecords.exams);
+            if (targetRecords.appointments) setAppointments(targetRecords.appointments);
+            if (targetRecords.vitals) setVitals(targetRecords.vitals);
 
             setSyncStatus('synced');
             setTimeout(() => {
@@ -525,6 +636,23 @@ export const HealthProvider = ({ children }) => {
     return () => unsubscribe();
   }, [familyGroupCode, authUser]);
 
+  // Handle active member switching in Family Group
+  useEffect(() => {
+    if (familyGroupCode && activeMemberName && familyMembersHealthData[activeMemberName]) {
+      const records = familyMembersHealthData[activeMemberName];
+      isRemoteUpdate.current = true;
+      if (records.userProfile) setUserProfile(records.userProfile);
+      if (records.medications) setMedications(records.medications);
+      if (records.intakeHistory) setIntakeHistory(records.intakeHistory);
+      if (records.exams) setExams(records.exams);
+      if (records.appointments) setAppointments(records.appointments);
+      if (records.vitals) setVitals(records.vitals);
+      setTimeout(() => {
+        isRemoteUpdate.current = false;
+      }, 300);
+    }
+  }, [activeMemberName, familyGroupCode]);
+
   // 2. Persist to Firebase Cloud Firestore on state modifications (Family Group or Individual UID)
   useEffect(() => {
     if (isFirebaseConfigured && !isRemoteUpdate.current) {
@@ -546,7 +674,8 @@ export const HealthProvider = ({ children }) => {
       };
 
       if (familyGroupCode) {
-        saveFamilyGroupHealthData(familyGroupCode, healthPayload)
+        const targetMemberName = activeMemberName || userProfile.name;
+        saveFamilyGroupHealthData(familyGroupCode, targetMemberName, healthPayload)
           .then(() => setSyncStatus('synced'))
           .catch(() => setSyncStatus('error'));
       } else if (authUser?.uid) {
@@ -555,7 +684,7 @@ export const HealthProvider = ({ children }) => {
           .catch(() => setSyncStatus('error'));
       }
     }
-  }, [userProfile, medications, intakeHistory, exams, appointments, vitals, familyGroupCode, authUser]);
+  }, [userProfile, medications, intakeHistory, exams, appointments, vitals, familyGroupCode, authUser, activeMemberName]);
 
   // Auth Handlers
   const registerPatient = async (email, password, fullName) => {
@@ -874,6 +1003,8 @@ export const HealthProvider = ({ children }) => {
         registerPatient,
         loginPatient,
         logoutPatient,
+        themeColor,
+        changeThemeColor,
         fontScale,
         setFontScale,
         highContrast,
@@ -883,6 +1014,10 @@ export const HealthProvider = ({ children }) => {
         stopSpeech,
         familyGroupCode,
         familyGroup,
+        activeMemberName,
+        setActiveMemberName,
+        familyMembersHealthData,
+        addFamilyMemberProfile,
         createFamilyGroup,
         joinFamilyGroup,
         leaveFamilyGroup,

@@ -8,6 +8,7 @@ import { ConsultationsTab } from './pages/ConsultationsTab';
 import { VitalsTab } from './pages/VitalsTab';
 import { ProfileTab } from './pages/ProfileTab';
 import { LandingPage } from './pages/LandingPage';
+import { UserGuideTab } from './pages/UserGuideTab';
 import './styles/global.css';
 
 const ScreenRouter = () => {
@@ -28,6 +29,8 @@ const ScreenRouter = () => {
       return <VitalsTab />;
     case 'profile':
       return <ProfileTab />;
+    case 'guide':
+      return <UserGuideTab />;
     default:
       return <HomeTab />;
   }

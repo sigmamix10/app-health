@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
 import { BottomNav } from './BottomNav';
-import { Wifi, Battery, Signal, Activity, Home, Pill, FileText, Calendar, User, Monitor, Cloud, CloudOff } from 'lucide-react';
+import { Wifi, Battery, Signal, Activity, Home, Pill, FileText, Calendar, User, Monitor, Cloud, CloudOff, BookOpen } from 'lucide-react';
 import { AuthModal } from './modals/AuthModal';
 import { AccessibilityWidget } from './AccessibilityWidget';
 
@@ -17,6 +17,7 @@ export const MobileFrame = ({ children }) => {
     { id: 'medications', label: 'Medicamentos', icon: Pill },
     { id: 'exams', label: 'Exames', icon: FileText },
     { id: 'consultations', label: 'Consultas', icon: Calendar },
+    { id: 'guide', label: 'Guia de Uso', icon: BookOpen },
     { id: 'profile', label: 'Perfil', icon: User }
   ];
 

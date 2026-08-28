@@ -5,20 +5,29 @@ import { RescheduleModal } from '../components/modals/RescheduleModal';
 import { DirectionsModal } from '../components/modals/DirectionsModal';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
 import { AddAppointmentModal } from '../components/modals/AddAppointmentModal';
+import { MemberSelectorBar } from '../components/common/MemberSelectorBar';
+import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
 
 export const ConsultationsTab = () => {
-  const { appointments } = useHealth();
+  const { appointments, userProfile } = useHealth();
   const [selectedReschedule, setSelectedReschedule] = useState(null);
   const [selectedDirections, setSelectedDirections] = useState(null);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isFamilyOpen, setIsFamilyOpen] = useState(false);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Family Group Member Selector Bar */}
+      <MemberSelectorBar
+        onOpenFamilyModal={() => setIsFamilyOpen(true)}
+        onAddMember={() => setIsFamilyOpen(true)}
+      />
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="page-title">Minhas Consultas</h1>
+          <h1 className="page-title">Consultas • {userProfile?.name}</h1>
           <p className="page-subtitle">Calendário e histórico médico</p>
         </div>
 
@@ -211,6 +220,7 @@ export const ConsultationsTab = () => {
         appointment={selectedDirections}
       />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+      <FamilyGroupModal isOpen={isFamilyOpen} onClose={() => setIsFamilyOpen(false)} />
     </div>
   );
 };

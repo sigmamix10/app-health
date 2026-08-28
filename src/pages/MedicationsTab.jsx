@@ -6,9 +6,11 @@ import { EditMedicationModal } from '../components/modals/EditMedicationModal';
 import { RefillStockModal } from '../components/modals/RefillStockModal';
 import { LogDoseModal } from '../components/modals/LogDoseModal';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
+import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
+import { MemberSelectorBar } from '../components/common/MemberSelectorBar';
 
 export const MedicationsTab = () => {
-  const { medications, intakeHistory, calculateStockPrediction } = useHealth();
+  const { medications, intakeHistory, calculateStockPrediction, userProfile } = useHealth();
   const [filter, setFilter] = useState('active'); // 'active' | 'archived'
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isLogDoseOpen, setIsLogDoseOpen] = useState(false);
@@ -16,6 +18,7 @@ export const MedicationsTab = () => {
   const [editingMed, setEditingMed] = useState(null);
   const [refillMed, setRefillMed] = useState(null);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isFamilyOpen, setIsFamilyOpen] = useState(false);
 
   const activeMeds = medications.filter((m) => m.category === 'active');
   const archivedMeds = medications.filter((m) => m.category === 'archived');
@@ -29,11 +32,17 @@ export const MedicationsTab = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
+      {/* Family Group Member Selector Bar */}
+      <MemberSelectorBar
+        onOpenFamilyModal={() => setIsFamilyOpen(true)}
+        onAddMember={() => setIsFamilyOpen(true)}
+      />
+
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 className="page-title">Meus Medicamentos</h1>
-          <p className="page-subtitle">Acompanhe seus horários, histórico de ingestão e estoque</p>
+          <h1 className="page-title">Medicamentos • {userProfile?.name}</h1>
+          <p className="page-subtitle">Acompanhe horários, histórico de ingestão e estoque</p>
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -395,6 +404,7 @@ export const MedicationsTab = () => {
       <EditMedicationModal isOpen={!!editingMed} onClose={() => setEditingMed(null)} med={editingMed} />
       <RefillStockModal isOpen={!!refillMed} onClose={() => setRefillMed(null)} med={refillMed} />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+      <FamilyGroupModal isOpen={isFamilyOpen} onClose={() => setIsFamilyOpen(false)} />
     </div>
   );
 };

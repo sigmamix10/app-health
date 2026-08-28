@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { useHealth } from '../context/HealthContext';
-import { Settings, Phone, Camera, Sparkles, Edit3, Users, KeyRound, ArrowRight, ShieldCheck, LogIn, LogOut } from 'lucide-react';
+import { useHealth, THEMES } from '../context/HealthContext';
+import { Settings, Phone, Camera, Sparkles, Edit3, Users, KeyRound, ArrowRight, ShieldCheck, LogIn, LogOut, Palette, Eye, Type, Volume2 } from 'lucide-react';
 import { NotificationCenterModal } from '../components/modals/NotificationCenterModal';
 import { EditProfileModal } from '../components/modals/EditProfileModal';
 import { FamilyGroupModal } from '../components/modals/FamilyGroupModal';
 import { AuthModal } from '../components/modals/AuthModal';
+import { ThemeColorModal } from '../components/modals/ThemeColorModal';
+import { AccessibilityModal } from '../components/modals/AccessibilityModal';
 
 export const ProfileTab = () => {
-  const { userProfile, familyGroupCode, familyGroup, authUser, logoutPatient } = useHealth();
+  const { userProfile, familyGroupCode, familyGroup, authUser, logoutPatient, themeColor, fontScale, highContrast } = useHealth();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [isA11yModalOpen, setIsA11yModalOpen] = useState(false);
   const [authInitialTab, setAuthInitialTab] = useState('login');
 
   const openAuth = (tabName = 'login') => {
@@ -414,6 +418,137 @@ export const ProfileTab = () => {
             </div>
           </div>
 
+          {/* Card: APARÊNCIA & CORES DO APLICATIVO */}
+          <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
+                APARÊNCIA & CORES DO APLICATIVO
+              </h3>
+              <button
+                onClick={() => setIsThemeModalOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--primary)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Palette size={14} /> Personalizar
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)`,
+                    boxShadow: '0 2px 8px var(--primary-glow)'
+                  }}
+                />
+                <div>
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                    {THEMES[themeColor]?.name || 'Verde Esmeralda'}
+                  </h4>
+                  <p style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+                    Paleta de cores ativa no aplicativo
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsThemeModalOpen(true)}
+                style={{
+                  backgroundColor: 'var(--primary-light)',
+                  color: 'var(--primary)',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Trocar Cor
+              </button>
+            </div>
+          </div>
+
+          {/* Card: ACESSIBILIDADE & INCLUSÃO (A11Y) */}
+          <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
+                ACESSIBILIDADE & INCLUSÃO (A11Y)
+              </h3>
+              <button
+                onClick={() => setIsA11yModalOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--primary)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Eye size={14} /> Ajustar
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    background: 'var(--primary-light)',
+                    color: 'var(--primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Eye size={18} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                    Texto {fontScale === 'xlarge' ? 'Extra Grande (+25%)' : fontScale === 'large' ? 'Grande (+12%)' : 'Normal'} • {highContrast ? 'Alto Contraste' : 'Contraste Padrão'}
+                  </h4>
+                  <p style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+                    Leitor de áudio por voz e navegação por teclado habilitados
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsA11yModalOpen(true)}
+                style={{
+                  backgroundColor: 'var(--primary-light)',
+                  color: 'var(--primary)',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Configurar
+              </button>
+            </div>
+          </div>
+
           {/* Card: CONTA DO PACIENTE (FIREBASE AUTH) */}
           <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
             <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
@@ -505,6 +640,8 @@ export const ProfileTab = () => {
       <FamilyGroupModal isOpen={isFamilyModalOpen} onClose={() => setIsFamilyModalOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialTab={authInitialTab} />
       <NotificationCenterModal isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+      <ThemeColorModal isOpen={isThemeModalOpen} onClose={() => setIsThemeModalOpen(false)} />
+      <AccessibilityModal isOpen={isA11yModalOpen} onClose={() => setIsA11yModalOpen(false)} />
     </div>
   );
 };

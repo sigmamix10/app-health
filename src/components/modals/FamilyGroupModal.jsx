@@ -9,6 +9,7 @@ export const FamilyGroupModal = ({ isOpen, onClose }) => {
     createFamilyGroup,
     joinFamilyGroup,
     leaveFamilyGroup,
+    addFamilyMemberProfile,
     userProfile
   } = useHealth();
 
@@ -216,7 +217,7 @@ export const FamilyGroupModal = ({ isOpen, onClose }) => {
                     key={i}
                     style={{
                       display: 'flex',
-                      justify: 'space-between',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
                       background: '#FFFFFF',
                       padding: '10px 12px',
@@ -248,6 +249,45 @@ export const FamilyGroupModal = ({ isOpen, onClose }) => {
                     </span>
                   </div>
                 ))}
+              </div>
+
+              {/* Add New Dependent Form */}
+              <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #E2E8F0' }}>
+                <h5 style={{ fontSize: '12px', fontWeight: 800, color: '#0D6C5D', marginBottom: '6px' }}>
+                  + Adicionar Perfil de Dependente / Familiar (Ex: Pais, Filhos)
+                </h5>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Nome (Ex: Maria - Mãe, João - Filho)"
+                    value={memberNameInput}
+                    onChange={(e) => setMemberNameInput(e.target.value)}
+                    style={{ fontSize: '12px', padding: '8px 12px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (memberNameInput.trim()) {
+                        addFamilyMemberProfile(memberNameInput.trim(), 'Dependente / Familiar');
+                        setMemberNameInput('');
+                      }
+                    }}
+                    style={{
+                      background: '#0D6C5D',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '8px 14px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      flexShrink: 0
+                    }}
+                  >
+                    Adicionar
+                  </button>
+                </div>
               </div>
             </div>
 
