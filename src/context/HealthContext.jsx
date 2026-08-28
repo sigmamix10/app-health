@@ -240,6 +240,24 @@ export const HealthProvider = ({ children }) => {
       iconColor: '#D97706'
     },
     {
+      id: 'med-5',
+      name: 'Vitamina D3',
+      shortName: 'Vitamina D3',
+      dosage: '50.000 UI',
+      frequency: 'Apenas aos Domingos',
+      dailyDoseCount: 0.14,
+      currentStock: 8,
+      totalStock: 10,
+      time: '09:00',
+      status: 'pending',
+      statusText: 'Pendente',
+      tagText: 'Domingo às 09:00',
+      nextDose: 'Próxima dose: Domingo às 09:00',
+      category: 'active',
+      iconBg: '#E0F2FE',
+      iconColor: '#0284C7'
+    },
+    {
       id: 'med-4',
       name: 'Amoxicilina',
       shortName: 'Amoxicilina',
@@ -689,7 +707,24 @@ export const HealthProvider = ({ children }) => {
 
   // Action Handler: Add New Medication
   const addMedication = (newMed) => {
-    const dailyCount = newMed.frequency === '2x ao dia' ? 2 : newMed.frequency === '3x ao dia' ? 3 : 1;
+    let dailyCount = 1;
+
+    if (newMed.frequencyType === 'specific_days' && Array.isArray(newMed.selectedDays)) {
+      dailyCount = Number((newMed.selectedDays.length / 7).toFixed(2));
+    } else if (newMed.frequencyType === 'alternate_days') {
+      if (newMed.frequency.includes('A cada 3 dias')) dailyCount = 0.33;
+      else if (newMed.frequency.includes('A cada 4 dias')) dailyCount = 0.25;
+      else if (newMed.frequency.includes('Semanalmente')) dailyCount = 0.14;
+      else if (newMed.frequency.includes('15 dias')) dailyCount = 0.07;
+      else dailyCount = 0.5; // Dia sim, dia não (48h)
+    } else if (newMed.frequencyType === 'as_needed') {
+      dailyCount = 0.1;
+    } else {
+      if (newMed.frequency.includes('2x')) dailyCount = 2;
+      else if (newMed.frequency.includes('3x')) dailyCount = 3;
+      else dailyCount = 1;
+    }
+
     const initialStock = Number(newMed.currentStock) || 30;
 
     const medObj = {
@@ -698,6 +733,8 @@ export const HealthProvider = ({ children }) => {
       shortName: newMed.name.split(' ')[0],
       dosage: newMed.dosage,
       frequency: newMed.frequency,
+      frequencyType: newMed.frequencyType || 'daily',
+      selectedDays: newMed.selectedDays || [],
       dailyDoseCount: dailyCount,
       currentStock: initialStock,
       totalStock: initialStock,
@@ -705,10 +742,10 @@ export const HealthProvider = ({ children }) => {
       status: 'pending',
       statusText: 'Pendente',
       tagText: `Às ${newMed.time || '08:00'}`,
-      nextDose: `Primeira dose: Hoje às ${newMed.time || '08:00'}`,
+      nextDose: `Agendado às ${newMed.time || '08:00'}`,
       category: 'active',
-      iconBg: '#FEF3C7',
-      iconColor: '#D97706'
+      iconBg: newMed.frequencyType === 'specific_days' ? '#E0F2FE' : '#FEF3C7',
+      iconColor: newMed.frequencyType === 'specific_days' ? '#0284C7' : '#D97706'
     };
     setMedications((prev) => [medObj, ...prev]);
   };
