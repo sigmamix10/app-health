@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Regra 1: Coleção de Usuários (/users/{userId})
+    // Cada usuário autenticado pode ler e escrever apenas no seu próprio documento de conta
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Regra 2: Coleção de Prontuários Médicos (/healthRecords/{docId})
+    // Permite leitura e escrita para pacientes autenticados no sistema
+    match /healthRecords/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Regra 3: Coleção do Grupo Familiar (/familyGroups/{groupCode})
+    // Permite que membros da família autenticados leiam e atualizem dados usando o código de 6 dígitos
+    match /familyGroups/{groupCode} {
+      allow read, write: if request.auth != null;
+    }
+
+  }
+}

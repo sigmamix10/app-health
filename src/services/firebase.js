@@ -9,15 +9,15 @@ import {
   updateProfile as updateFirebaseProfile
 } from 'firebase/auth';
 
-// Configuration from environment variables
+// Configuration from environment variables with direct project fallbacks
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBy4rrIaVQcDy0tlyvYve-yIBPyO6Sp4Ag",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "health-app-c907c.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "health-app-c907c",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "health-app-c907c.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "698692339353",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:698692339353:web:790237489467189942da08",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-VR74SN0GHP"
 };
 
 // Check if valid Firebase configuration is provided
