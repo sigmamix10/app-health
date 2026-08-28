@@ -471,10 +471,10 @@ export const HealthProvider = ({ children }) => {
           setSyncStatus('error');
         }
       );
-    } else {
+    } else if (authUser?.uid) {
       // Subscribe to Individual Patient Document (Using Auth UID if logged in)
       unsubscribe = subscribeToPatientRecord(
-        authUser?.uid,
+        authUser.uid,
         (remoteData) => {
           if (remoteData) {
             isRemoteUpdate.current = true;
@@ -488,7 +488,7 @@ export const HealthProvider = ({ children }) => {
             setTimeout(() => {
               isRemoteUpdate.current = false;
             }, 300);
-          } else if (authUser) {
+          } else {
             // New user without remote data yet -> Initialize clean record
             isRemoteUpdate.current = true;
             const newProfile = {
@@ -528,6 +528,12 @@ export const HealthProvider = ({ children }) => {
   // 2. Persist to Firebase Cloud Firestore on state modifications (Family Group or Individual UID)
   useEffect(() => {
     if (isFirebaseConfigured && !isRemoteUpdate.current) {
+      // ONLY persist to Cloud Firestore if user is authenticated OR in a family group
+      if (!authUser && !familyGroupCode) {
+        setSyncStatus('disconnected');
+        return;
+      }
+
       setSyncStatus('syncing');
 
       const healthPayload = {
@@ -543,8 +549,8 @@ export const HealthProvider = ({ children }) => {
         saveFamilyGroupHealthData(familyGroupCode, healthPayload)
           .then(() => setSyncStatus('synced'))
           .catch(() => setSyncStatus('error'));
-      } else {
-        savePatientRecordToFirestore(authUser?.uid, healthPayload)
+      } else if (authUser?.uid) {
+        savePatientRecordToFirestore(authUser.uid, healthPayload)
           .then(() => setSyncStatus('synced'))
           .catch(() => setSyncStatus('error'));
       }
