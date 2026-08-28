@@ -68,11 +68,34 @@ export const registerUserWithEmail = async (email, password, displayName) => {
   }
 
   try {
+    // 1. Save user credentials (email & password) in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
     const user = userCredential.user;
 
+    // 2. Update display name in Firebase Auth Profile
     if (displayName && displayName.trim()) {
       await updateFirebaseProfile(user, { displayName: displayName.trim() });
+    }
+
+    // 3. Create user account record in Firestore 'users' collection
+    if (db) {
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(
+          userDocRef,
+          {
+            uid: user.uid,
+            email: user.email,
+            displayName: displayName || user.displayName || email.split('@')[0],
+            createdAt: new Date().toISOString(),
+            authProvider: 'password'
+          },
+          { merge: true }
+        );
+        console.log(`[Firebase Auth & Firestore] User account created: ${user.uid} (${user.email})`);
+      } catch (dbErr) {
+        console.warn('[Firebase Firestore] Warning saving user doc to users collection:', dbErr);
+      }
     }
 
     return {
