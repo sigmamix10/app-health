@@ -36,25 +36,48 @@ export const VitalsTab = () => {
           <h1 className="page-title">Sinais Vitais</h1>
           <p className="page-subtitle">Gráficos e histórico de monitoramento</p>
         </div>
-        <button
-          onClick={() => setIsNotifOpen(true)}
-          style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '50%',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #EBF1F0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#0F172A',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-          }}
-          aria-label="Notificações"
-        >
-          <Bell size={20} />
-        </button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            onClick={() => setIsAddVitalOpen(true)}
+            style={{
+              backgroundColor: '#0D6C5D',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '100px',
+              padding: '8px 16px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 12px rgba(13, 108, 93, 0.2)'
+            }}
+          >
+            <Plus size={16} />
+            <span>Nova Medição</span>
+          </button>
+
+          <button
+            onClick={() => setIsNotifOpen(true)}
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #EBF1F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#0F172A',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+            }}
+            aria-label="Notificações"
+          >
+            <Bell size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Top 2 Cards Row: Pressão Arterial & Frequência Cardíaca */}

@@ -126,11 +126,12 @@ export const MedicationsTab = () => {
 
       {/* List of Medications Cards */}
       <div className="grid-responsive-2">
-        {displayedMeds.map((med) => {
-          const prediction = calculateStockPrediction(med.currentStock, med.dailyDoseCount);
-          const stockPercent = Math.min(100, Math.round((med.currentStock / (med.totalStock || 30)) * 100));
+        {displayedMeds.length > 0 ? (
+          displayedMeds.map((med) => {
+            const prediction = calculateStockPrediction(med.currentStock, med.dailyDoseCount);
+            const stockPercent = Math.min(100, Math.round((med.currentStock / (med.totalStock || 30)) * 100));
 
-          return (
+            return (
             <div
               key={med.id}
               className="card"
@@ -290,8 +291,41 @@ export const MedicationsTab = () => {
                 </div>
               </div>
             </div>
-          );
-        })}
+          )
+        })
+      ) : (
+        <div className="card" style={{ gridColumn: '1 / -1', padding: '40px 20px', textAlign: 'center', borderRadius: '22px' }}>
+          <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: '#E6F5F2', color: '#0D6C5D', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
+            <Pill size={28} />
+          </div>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+            {filter === 'active' ? 'Nenhum medicamento cadastrado' : 'Nenhum medicamento arquivado'}
+          </h3>
+          <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '400px', margin: '0 auto 20px auto', lineHeight: 1.5 }}>
+            {filter === 'active'
+              ? 'Comece adicionando os remédios de uso contínuo ou temporário que você utiliza no seu dia a dia.'
+              : 'Medicamentos arquivados aparecerão aqui.'}
+          </p>
+          {filter === 'active' && (
+            <button
+              onClick={() => setIsAddOpen(true)}
+              style={{
+                background: '#0D6C5D',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '100px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(13, 108, 93, 0.25)'
+              }}
+            >
+              + Cadastrar Primeiro Medicamento
+            </button>
+          )}
+        </div>
+      )}
       </div>
 
       {/* Daily Intake History Section */}

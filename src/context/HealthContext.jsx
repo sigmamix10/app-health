@@ -538,9 +538,34 @@ export const HealthProvider = ({ children }) => {
     try {
       const user = await registerUserWithEmail(email, password, fullName);
       setAuthUser(user);
-      if (fullName) {
-        setUserProfile((prev) => ({ ...prev, name: fullName }));
-      }
+
+      const cleanProfile = {
+        name: fullName || 'Novo Paciente',
+        age: 'Não informado',
+        location: 'Brasil',
+        greeting: 'Bem-vindo(a) ao seu acompanhamento de saúde!',
+        avatar: `https://api.dicebear.com/10.x/voxel-art/svg?seed=${encodeURIComponent(fullName || email)}`,
+        bloodType: '--',
+        height: '--',
+        weight: '--',
+        allergiesAndConditions: [],
+        emergencyContact: { name: '', relation: '', phone: '' },
+        healthPlan: { name: 'Sem plano cadastrado', planType: '', number: '' }
+      };
+
+      setUserProfile(cleanProfile);
+      setMedications([]);
+      setIntakeHistory([]);
+      setExams([]);
+      setAppointments([]);
+      setVitals({
+        bloodPressure: { systolic: '--', diastolic: '--', unit: 'mmHg', status: 'Sem medição' },
+        heartRate: { value: '--', unit: 'bpm', status: 'Sem medição' },
+        weight: { value: '--', unit: 'kg', target: '--' },
+        glucose: { value: '--', unit: 'mg/dL', status: 'Sem medição' },
+        history7Days: []
+      });
+
       setActiveTab('home');
       return user;
     } catch (error) {

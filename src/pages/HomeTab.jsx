@@ -119,51 +119,83 @@ export const HomeTab = () => {
         {/* Left Column: Próxima Consulta & Sinais Vitais */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Next Appointment Green Card (Exact Figma match) */}
-          <div className="card card-primary" style={{ padding: '22px', borderRadius: '22px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={18} style={{ color: '#E6F5F2' }} />
-                <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.8px', color: '#E6F5F2', textTransform: 'uppercase' }}>
-                  PRÓXIMA CONSULTA
+          {nextAppointment ? (
+            <div className="card card-primary" style={{ padding: '22px', borderRadius: '22px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Calendar size={18} style={{ color: '#E6F5F2' }} />
+                  <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.8px', color: '#E6F5F2', textTransform: 'uppercase' }}>
+                    PRÓXIMA CONSULTA
+                  </span>
+                </div>
+                <span className="badge badge-white-translucent" style={{ fontSize: '11px', padding: '4px 10px' }}>
+                  Confirmado
                 </span>
               </div>
-              <span className="badge badge-white-translucent" style={{ fontSize: '11px', padding: '4px 10px' }}>
-                Confirmado
-              </span>
+
+              <h3 style={{ fontSize: '22px', fontWeight: 800, marginBottom: '4px', color: '#FFFFFF' }}>
+                {nextAppointment.doctor}
+              </h3>
+              <p style={{ fontSize: '14px', color: '#D8F3EE', fontWeight: 500, marginBottom: '20px' }}>
+                {nextAppointment.specialty} • {nextAppointment.hospital}
+              </p>
+
+              <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.15)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', fontWeight: 600, color: '#FFFFFF' }}>
+                  {nextAppointment.dateText}, às {nextAppointment.timeText}
+                </span>
+                <button
+                  onClick={() => {
+                    setSelectedApp(nextAppointment);
+                    setIsDirectionsOpen(true);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  Ver Detalhes <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
-
-            <h3 style={{ fontSize: '22px', fontWeight: 800, marginBottom: '4px', color: '#FFFFFF' }}>
-              {nextAppointment.doctor}
-            </h3>
-            <p style={{ fontSize: '14px', color: '#D8F3EE', fontWeight: 500, marginBottom: '20px' }}>
-              {nextAppointment.specialty} • {nextAppointment.hospital}
-            </p>
-
-            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.15)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: '#FFFFFF' }}>
-                {nextAppointment.dateText}, às {nextAppointment.timeText}
-              </span>
+          ) : (
+            <div className="card card-primary" style={{ padding: '22px', borderRadius: '22px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <Calendar size={18} style={{ color: '#E6F5F2' }} />
+                <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.8px', color: '#E6F5F2', textTransform: 'uppercase' }}>
+                  NENHUMA CONSULTA AGENDADA
+                </span>
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px', color: '#FFFFFF' }}>
+                Organize suas consultas médicas
+              </h3>
+              <p style={{ fontSize: '13px', color: '#D8F3EE', marginBottom: '16px', lineHeight: 1.4 }}>
+                Cadastre seus médicos especialistas, horários de atendimento e endereços de consultórios em um só lugar.
+              </p>
               <button
-                onClick={() => {
-                  setSelectedApp(nextAppointment);
-                  setIsDirectionsOpen(true);
-                }}
+                onClick={() => setActiveTab('consultations')}
                 style={{
-                  background: 'none',
+                  background: '#FFFFFF',
+                  color: '#0D6C5D',
                   border: 'none',
-                  color: '#FFFFFF',
+                  padding: '10px 18px',
+                  borderRadius: '12px',
                   fontSize: '13px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
+                  fontWeight: 800,
+                  cursor: 'pointer'
                 }}
               >
-                Ver Detalhes <ChevronRight size={14} />
+                + Agendar Primeira Consulta
               </button>
             </div>
-          </div>
+          )}
 
           {/* Vital Signs Section */}
           <div>
@@ -262,47 +294,81 @@ export const HomeTab = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {todayMeds.map((med) => (
-              <div
-                key={med.id}
-                className="card"
-                onClick={() => toggleMedicationStatus(med.id)}
-                style={{
-                  padding: '18px',
-                  borderRadius: '18px',
-                  cursor: 'pointer',
-                  border: med.status === 'taken' ? '1px solid #BCE5DC' : '1px solid #EBF1F0',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '12px',
-                      backgroundColor: med.iconBg,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: med.iconColor
-                    }}
-                  >
-                    <Pill size={20} />
+            {todayMeds.length > 0 ? (
+              todayMeds.map((med) => (
+                <div
+                  key={med.id}
+                  className="card"
+                  onClick={() => toggleMedicationStatus(med.id)}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '18px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '14px',
+                        backgroundColor: med.iconBg || '#FEF3C7',
+                        color: med.iconColor || '#D97706',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Pill size={22} />
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                        {med.shortName || med.name}
+                      </h4>
+                      <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
+                        {med.dosage} • {med.time}
+                      </p>
+                    </div>
                   </div>
-                  <span className={`badge ${med.status === 'taken' ? 'badge-green' : 'badge-orange'}`}>
-                    {med.statusText}
+                  <span
+                    className={`badge ${med.status === 'taken' ? 'badge-green' : 'badge-orange'}`}
+                    style={{ fontSize: '11px' }}
+                  >
+                    {med.statusText || med.status}
                   </span>
                 </div>
-
-                <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                  {med.shortName}
+              ))
+            ) : (
+              <div className="card" style={{ padding: '20px', textAlign: 'center', borderRadius: '18px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px auto' }}>
+                  <Pill size={20} />
+                </div>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>
+                  Nenhum medicamento cadastrado
                 </h4>
-                <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500 }}>
-                  {med.dosage} • {med.time}
+                <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '14px', lineHeight: 1.4 }}>
+                  Cadastre os remédios da sua rotina para acompanhar horários e doses.
                 </p>
+                <button
+                  onClick={() => setActiveTab('medications')}
+                  style={{
+                    background: '#0D6C5D',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '10px 16px',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  + Cadastrar Medicamento
+                </button>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
