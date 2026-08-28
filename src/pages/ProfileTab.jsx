@@ -232,38 +232,69 @@ export const ProfileTab = () => {
 
           {/* Card: CONTATOS DE EMERGÊNCIA */}
           <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
-            <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
-              CONTATOS DE EMERGÊNCIA
-            </h3>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>
-                  {userProfile.emergencyContact.name}
-                </h4>
-                <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
-                  {userProfile.emergencyContact.relation} • {userProfile.emergencyContact.phone}
-                </p>
-              </div>
-
-              <a
-                href={`tel:${userProfile.emergencyContact.phone.replace(/\D/g, '')}`}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
+                CONTATOS DE EMERGÊNCIA
+              </h3>
+              <button
+                onClick={() => setIsEditProfileOpen(true)}
                 style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '50%',
-                  backgroundColor: '#E6F5F2',
+                  background: 'none',
+                  border: 'none',
+                  color: '#0D6C5D',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#0D6C5D',
-                  textDecoration: 'none',
-                  transition: 'transform 0.15s ease'
+                  gap: '4px'
                 }}
-                aria-label="Ligar para emergência"
               >
-                <Phone size={20} />
-              </a>
+                <Edit3 size={13} /> Editar
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {userProfile.emergencyContact?.name ? (
+                <div>
+                  <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>
+                    {userProfile.emergencyContact.name}
+                  </h4>
+                  <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
+                    {userProfile.emergencyContact.relation || 'Contato'} {userProfile.emergencyContact.phone ? `• ${userProfile.emergencyContact.phone}` : ''}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#94A3B8' }}>
+                    Nenhum contato cadastrado
+                  </h4>
+                  <p style={{ fontSize: '12px', color: '#CBD5E1', marginTop: '2px' }}>
+                    Clique em Editar para cadastrar um telefone de emergência
+                  </p>
+                </div>
+              )}
+
+              {userProfile.emergencyContact?.phone && (
+                <a
+                  href={`tel:${userProfile.emergencyContact.phone.replace(/\D/g, '')}`}
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    backgroundColor: '#E6F5F2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#0D6C5D',
+                    textDecoration: 'none',
+                    transition: 'transform 0.15s ease'
+                  }}
+                  aria-label="Ligar para emergência"
+                >
+                  <Phone size={20} />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -272,72 +303,114 @@ export const ProfileTab = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Card: ALERGIAS E CONDIÇÕES */}
           <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
-            <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
-              ALERGIAS E CONDIÇÕES
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
+                ALERGIAS E CONDIÇÕES
+              </h3>
+              <button
+                onClick={() => setIsEditProfileOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#0D6C5D',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Edit3 size={13} /> Editar
+              </button>
+            </div>
 
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <span
-                style={{
-                  backgroundColor: '#FEE2E2',
-                  color: '#EF4444',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  padding: '8px 14px',
-                  borderRadius: '12px'
-                }}
-              >
-                Alergia: Penicilina
-              </span>
-              <span
-                style={{
-                  backgroundColor: '#FEF3C7',
-                  color: '#D97706',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  padding: '8px 14px',
-                  borderRadius: '12px'
-                }}
-              >
-                Hipertensão Leve
-              </span>
+              {userProfile.allergiesAndConditions && userProfile.allergiesAndConditions.length > 0 ? (
+                userProfile.allergiesAndConditions.map((item, idx) => {
+                  const text = typeof item === 'string' ? item : item.text;
+                  const isDanger = typeof item === 'object' ? item.type === 'danger' : text.toLowerCase().includes('alergia');
+                  return (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: isDanger ? '#FEE2E2' : '#FEF3C7',
+                        color: isDanger ? '#EF4444' : '#D97706',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        padding: '8px 14px',
+                        borderRadius: '12px'
+                      }}
+                    >
+                      {text}
+                    </span>
+                  );
+                })
+              ) : (
+                <span style={{ fontSize: '13px', color: '#94A3B8', fontWeight: 500 }}>
+                  Nenhuma alergia ou condição cadastrada
+                </span>
+              )}
             </div>
           </div>
 
           {/* Card: PLANO DE SAÚDE */}
           <div className="card" style={{ padding: '18px', borderRadius: '20px' }}>
-            <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '12px' }}>
-              PLANO DE SAÚDE
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>
+                PLANO DE SAÚDE
+              </h3>
+              <button
+                onClick={() => setIsEditProfileOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#0D6C5D',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Edit3 size={13} /> Editar
+              </button>
+            </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>
-                  {userProfile.healthPlan.name}
+                  {userProfile.healthPlan?.name || 'Sem plano cadastrado'}
                 </h4>
                 <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
-                  {userProfile.healthPlan.planType} • {userProfile.healthPlan.number}
+                  {userProfile.healthPlan?.planType
+                    ? `${userProfile.healthPlan.planType} ${userProfile.healthPlan.number ? `• ${userProfile.healthPlan.number}` : ''}`
+                    : userProfile.healthPlan?.number || 'Clique em Editar para cadastrar a carteirinha'}
                 </p>
               </div>
 
-              {/* Bradesco Saúde Badge Logo */}
-              <div
-                style={{
-                  backgroundColor: '#0F2644',
-                  color: '#FFFFFF',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  letterSpacing: '0.3px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
-                }}
-              >
-                <span style={{ color: '#CC092F', fontWeight: 900 }}>Bradesco</span> Saúde
-              </div>
+              {/* Health Plan Badge Icon */}
+              {userProfile.healthPlan?.name && userProfile.healthPlan.name !== 'Sem plano cadastrado' && (
+                <div
+                  style={{
+                    backgroundColor: '#0F2644',
+                    color: '#FFFFFF',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    letterSpacing: '0.3px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <ShieldCheck size={14} color="#10B981" />
+                  <span>{userProfile.healthPlan.name}</span>
+                </div>
+              )}
             </div>
           </div>
 
