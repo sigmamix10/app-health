@@ -541,6 +541,7 @@ export const HealthProvider = ({ children }) => {
       if (fullName) {
         setUserProfile((prev) => ({ ...prev, name: fullName }));
       }
+      setActiveTab('home');
       return user;
     } catch (error) {
       console.error('Error registering patient:', error);
@@ -555,6 +556,7 @@ export const HealthProvider = ({ children }) => {
       if (user.displayName) {
         setUserProfile((prev) => ({ ...prev, name: user.displayName }));
       }
+      setActiveTab('home');
       return user;
     } catch (error) {
       console.error('Error logging in patient:', error);

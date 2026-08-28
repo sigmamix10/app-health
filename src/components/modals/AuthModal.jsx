@@ -3,7 +3,7 @@ import { useHealth } from '../../context/HealthContext';
 import { X, Lock, Mail, User, ShieldCheck, LogIn, UserPlus } from 'lucide-react';
 
 export const AuthModal = ({ isOpen, onClose, initialTab = 'login' }) => {
-  const { registerPatient, loginPatient, authUser, logoutPatient } = useHealth();
+  const { registerPatient, loginPatient, authUser, logoutPatient, setActiveTab } = useHealth();
   const [tab, setTab] = useState(initialTab); // 'login' | 'register'
 
   const [email, setEmail] = useState('');
@@ -31,6 +31,7 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'login' }) => {
     try {
       await loginPatient(email.trim(), password);
       setIsLoading(false);
+      setActiveTab('home');
       onClose();
     } catch (err) {
       setIsLoading(false);
@@ -70,10 +71,8 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'login' }) => {
     try {
       await registerPatient(email.trim(), password, fullName.trim());
       setIsLoading(false);
-      setSuccessMsg('Conta criada com sucesso no Firebase!');
-      setTimeout(() => {
-        onClose();
-      }, 1000);
+      setActiveTab('home');
+      onClose();
     } catch (err) {
       setIsLoading(false);
       if (err.code === 'auth/email-already-in-use') {
