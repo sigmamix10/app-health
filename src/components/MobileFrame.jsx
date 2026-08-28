@@ -55,16 +55,19 @@ export const MobileFrame = ({ children }) => {
                     width: '38px',
                     height: '38px',
                     borderRadius: '12px',
-                    backgroundColor: '#E6F5F2',
+                    backgroundColor: '#0D6C5D',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#0D6C5D'
+                    boxShadow: '0 4px 10px rgba(13, 108, 93, 0.25)'
                   }}
                 >
-                  <Activity size={22} />
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    <path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h4.28" stroke="#FFFFFF" strokeWidth="2.2" />
+                  </svg>
                 </div>
-                <span>Saúde & Acompanhamento</span>
+                <span style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px' }}>Health App</span>
               </div>
 
               {/* Navigation Tabs for Desktop / Notebook (Exibidas apenas quando autenticado) */}

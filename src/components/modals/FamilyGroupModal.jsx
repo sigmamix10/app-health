@@ -33,7 +33,7 @@ export const FamilyGroupModal = ({ isOpen, onClose }) => {
   const handleShareWhatsApp = () => {
     if (!familyGroupCode) return;
     const text = encodeURIComponent(
-      `Olá! Entre no nosso Grupo Familiar no app Saúde & Acompanhamento usando o código de 6 dígitos: *${familyGroupCode}* para compartilharmos consultas, exames e remédios!`
+      `Olá! Entre no nosso Grupo Familiar no app Health App usando o código de 6 dígitos: *${familyGroupCode}* para compartilharmos consultas, exames e remédios!`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };

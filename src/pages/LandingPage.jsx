@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useHealth } from '../context/HealthContext';
-import { Activity, Pill, FileText, Calendar, Users, ShieldCheck, ArrowRight, Sparkles, HeartPulse, CheckCircle2, Lock } from 'lucide-react';
 import { AuthModal } from '../components/modals/AuthModal';
+import { X, ShieldCheck, FileText } from 'lucide-react';
 
 export const LandingPage = ({ onContinueAsGuest }) => {
   const { setActiveTab } = useHealth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState('login');
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
 
   const handleOpenAuth = (tabName) => {
     setAuthTab(tabName);
@@ -27,292 +28,379 @@ export const LandingPage = ({ onContinueAsGuest }) => {
         minHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
-        padding: '24px 16px',
-        background: 'linear-gradient(180deg, #F4FBF9 0%, #FFFFFF 100%)'
+        justifyContent: 'center',
+        padding: '20px 16px 24px 16px',
+        backgroundColor: '#F8FAFC',
+        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        boxSizing: 'border-box'
       }}
     >
-      {/* Container Wrapper */}
-      <div style={{ maxWidth: '640px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        
-        {/* App Logo Badge */}
+      {/* Main Column Container */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '380px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}
+      >
+        {/* Top Header Logo & Brand */}
         <div
           style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '20px',
-            background: 'linear-gradient(135deg, #0D6C5D 0%, #084D42 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FFFFFF',
-            boxShadow: '0 10px 25px rgba(13, 108, 93, 0.3)',
+            gap: '12px',
             marginBottom: '20px'
           }}
         >
-          <Activity size={36} />
+          {/* Logo Icon Squircle */}
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '14px',
+              backgroundColor: '#0D6C5D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 6px 16px rgba(13, 108, 93, 0.25)',
+              flexShrink: 0
+            }}
+          >
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+              <path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h4.28" stroke="#FFFFFF" strokeWidth="2.2" />
+            </svg>
+          </div>
+
+          {/* Brand Name */}
+          <h1
+            style={{
+              fontSize: '28px',
+              fontWeight: 800,
+              color: '#0F172A',
+              margin: 0,
+              letterSpacing: '-0.6px',
+              lineHeight: 1
+            }}
+          >
+            Health App
+          </h1>
         </div>
 
-        {/* Hero Title */}
-        <h1
+        {/* Hero Image Container Card with Unsplash Photo */}
+        <div
           style={{
-            fontSize: '32px',
-            fontWeight: 900,
+            width: '100%',
+            height: '270px',
+            borderRadius: '28px',
+            position: 'relative',
+            boxShadow: '0 12px 30px rgba(15, 23, 42, 0.12)',
+            marginBottom: '24px',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            backgroundColor: '#1E293B'
+          }}
+        >
+          {/* Main Unsplash Stethoscope & Clipboard Photo */}
+          <img
+            src="/landing-banner.jpg"
+            onError={(e) => {
+              e.target.src = 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?q=80&w=1000&auto=format&fit=crop';
+            }}
+            alt="Health App Prancheta e Estetoscópio"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block'
+            }}
+          />
+
+          {/* Subtle Gradient Overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.5) 100%)',
+              pointerEvents: 'none'
+            }}
+          />
+
+          {/* Top-Left Badge */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '16px',
+              left: '16px',
+              backgroundColor: '#FFFFFF',
+              padding: '6px 14px',
+              borderRadius: '100px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              zIndex: 5
+            }}
+          >
+            <span
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: '#0D6C5D',
+                display: 'inline-block'
+              }}
+            />
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 800,
+                color: '#0D6C5D',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase'
+              }}
+            >
+              SUA SAÚDE EM DIA
+            </span>
+          </div>
+
+          {/* Bottom Banner Glassmorphism Label */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '16px',
+              left: '16px',
+              right: '16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(8px)',
+              padding: '10px 14px',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+              zIndex: 5
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '8px',
+                  backgroundColor: '#E6F5F2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#0D6C5D'
+                }}
+              >
+                <ShieldCheck size={16} />
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>
+                Prontuário & Rotina Médica
+              </span>
+            </div>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: '#0D6C5D', backgroundColor: '#E6F5F2', padding: '3px 8px', borderRadius: '100px' }}>
+              Digital
+            </span>
+          </div>
+        </div>
+
+        {/* Main Headline */}
+        <h2
+          style={{
+            fontSize: '23px',
+            fontWeight: 800,
             color: '#0F172A',
             textAlign: 'center',
-            letterSpacing: '-0.8px',
-            lineHeight: 1.2,
-            marginBottom: '12px'
+            letterSpacing: '-0.3px',
+            lineHeight: 1.25,
+            margin: '0 0 10px 0',
+            maxWidth: '320px'
           }}
         >
-          Saúde & Acompanhamento
-        </h1>
+          Seu companheiro de saúde pessoal
+        </h2>
 
+        {/* Subtitle Text */}
         <p
           style={{
-            fontSize: '16px',
-            color: '#475569',
+            fontSize: '13.5px',
+            color: '#64748B',
             textAlign: 'center',
             lineHeight: 1.5,
-            maxWidth: '480px',
-            marginBottom: '28px',
-            fontWeight: 500
+            maxWidth: '340px',
+            margin: '0 0 28px 0',
+            fontWeight: 400
           }}
         >
-          Seu prontuário digital completo. Sincronize exames, medicamentos, consultas e grupo familiar com segurança no Firebase.
+          Acompanhe seus medicamentos de forma simples, organize exames, agende consultas médicas e monitore seus sinais vitais diariamente em um só lugar.
         </p>
 
-        {/* Main Action Buttons: Entrar ou Cadastrar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '360px', marginBottom: '32px' }}>
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '340px' }}>
+          {/* Primary Action Button: Entrar */}
           <button
-            onClick={() => handleOpenAuth('register')}
+            onClick={() => handleOpenAuth('login')}
             style={{
               backgroundColor: '#0D6C5D',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '16px',
-              padding: '16px 24px',
-              fontSize: '16px',
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
+              padding: '15px 24px',
+              fontSize: '15.5px',
+              fontWeight: 700,
               cursor: 'pointer',
-              boxShadow: '0 8px 20px rgba(13, 108, 93, 0.25)',
-              transition: 'transform 0.15s ease'
+              boxShadow: '0 6px 18px rgba(13, 108, 93, 0.2)',
+              transition: 'transform 0.15s ease, background-color 0.15s ease',
+              textAlign: 'center',
+              width: '100%'
             }}
           >
-            <span>Criar Minha Conta Grátis</span>
-            <ArrowRight size={20} />
+            Entrar
           </button>
 
+          {/* Secondary Action Button: Criar Conta Grátis */}
           <button
-            onClick={() => handleOpenAuth('login')}
+            onClick={() => handleOpenAuth('register')}
             style={{
               backgroundColor: '#FFFFFF',
               color: '#0D6C5D',
-              border: '2px solid #0D6C5D',
+              border: '1.5px solid #E2E8F0',
               borderRadius: '16px',
               padding: '14px 24px',
-              fontSize: '15px',
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
+              fontSize: '15.5px',
+              fontWeight: 700,
               cursor: 'pointer',
-              transition: 'background-color 0.15s ease'
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)',
+              transition: 'background-color 0.15s ease',
+              textAlign: 'center',
+              width: '100%'
             }}
           >
-            <Lock size={18} />
-            <span>Já tenho conta (Entrar)</span>
+            Criar Conta Grátis
           </button>
+        </div>
 
+        {/* Terms of Use Footer Link */}
+        <p style={{ fontSize: '12px', color: '#94A3B8', textAlign: 'center', marginTop: '22px', marginBottom: '6px' }}>
+          Ao continuar, você concorda com nossos{' '}
           <button
-            onClick={handleGuest}
+            onClick={() => setIsTermsOpen(true)}
             style={{
-              backgroundColor: 'transparent',
-              color: '#64748B',
+              background: 'none',
               border: 'none',
-              borderRadius: '12px',
-              padding: '10px',
-              fontSize: '13px',
+              padding: 0,
+              color: '#0D6C5D',
+              textDecoration: 'underline',
               fontWeight: 600,
               cursor: 'pointer',
-              textDecoration: 'underline'
+              fontSize: '12px'
             }}
           >
-            Experimentar sem logar (Modo Convidado)
+            Termos de Uso
           </button>
-        </div>
+        </p>
 
-        {/* 4 Feature Highlights Grid */}
-        <div
+        {/* Quick Guest Link so user can explore app freely */}
+        <button
+          onClick={handleGuest}
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '14px',
-            width: '100%'
+            background: 'none',
+            border: 'none',
+            color: '#94A3B8',
+            fontSize: '11px',
+            cursor: 'pointer',
+            marginBottom: '12px',
+            textDecoration: 'none'
           }}
         >
-          {/* Card 1 */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              padding: '18px',
-              borderRadius: '18px',
-              border: '1px solid #E2E8F0',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
-            }}
-          >
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '12px',
-                background: '#FEF3C7',
-                color: '#D97706',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}
-            >
-              <Pill size={20} />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                Gestão de Remédios
-              </h4>
-              <p style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
-                Controle de horários, notificações de dose e previsão automática de estoque.
-              </p>
-            </div>
-          </div>
+          (Explorar no Modo Convidado)
+        </button>
 
-          {/* Card 2 */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              padding: '18px',
-              borderRadius: '18px',
-              border: '1px solid #E2E8F0',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
-            }}
-          >
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '12px',
-                background: '#E6F5F2',
-                color: '#0D6C5D',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}
-            >
-              <Users size={20} />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                Grupo Familiar (PIN 6 dígitos)
-              </h4>
-              <p style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
-                Compartilhe o histórico de consultas e exames da família através de um código de 6 dígitos.
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              padding: '18px',
-              borderRadius: '18px',
-              border: '1px solid #E2E8F0',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
-            }}
-          >
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '12px',
-                background: '#EEF2FF',
-                color: '#4F46E5',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}
-            >
-              <Calendar size={20} />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                Exames & Consultas
-              </h4>
-              <p style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
-                Agendamento de consultas com avatar do médico, exames laboratoriais e laudos.
-              </p>
-            </div>
-          </div>
-
-          {/* Card 4 */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              padding: '18px',
-              borderRadius: '18px',
-              border: '1px solid #E2E8F0',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
-            }}
-          >
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '12px',
-                background: '#FEE2E2',
-                color: '#EF4444',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}
-            >
-              <ShieldCheck size={20} />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                Segurança Firebase Nuvem
-              </h4>
-              <p style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
-                Seus dados protegidos por autenticação de e-mail e senha com sincronização automática.
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* iOS Home Indicator Bar */}
+        <div
+          style={{
+            width: '134px',
+            height: '5px',
+            backgroundColor: '#CBD5E1',
+            borderRadius: '100px',
+            marginTop: '4px',
+            marginBottom: '8px'
+          }}
+        />
       </div>
 
-      {/* Auth Modal */}
+      {/* Auth Modal Trigger */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialTab={authTab} />
+
+      {/* Terms of Use Modal */}
+      {isTermsOpen && (
+        <div className="modal-overlay" onClick={() => setIsTermsOpen(false)}>
+          <div className="modal-sheet" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '12px',
+                    backgroundColor: '#E6F5F2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#0D6C5D'
+                  }}
+                >
+                  <FileText size={20} />
+                </div>
+                <h3 className="modal-title" style={{ fontSize: '18px' }}>
+                  Termos de Uso - Health App
+                </h3>
+              </div>
+              <button className="modal-close-btn" onClick={() => setIsTermsOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ fontSize: '13px', color: '#475569', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p>
+                <strong>1. Privacidade e Segurança:</strong> O Health App prioriza a proteção dos seus dados de saúde. Todas as informações registradas (medicamentos, exames, consultas e sinais vitais) são armazenadas com criptografia e privacidade.
+              </p>
+              <p>
+                <strong>2. Uso Informativo:</strong> O aplicativo funciona como um assistente pessoal de acompanhamento de rotina de saúde. Ele não substitui consultas médicas, diagnósticos profissionais ou emergências clínicas.
+              </p>
+              <p>
+                <strong>3. Grupo Familiar:</strong> Ao compartilhar dados através do PIN de 6 dígitos do Grupo Familiar, certifique-se de disponibilizar o código apenas com pessoas de sua confiança.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsTermsOpen(false)}
+              className="form-submit-btn"
+              style={{ marginTop: '20px' }}
+            >
+              Entendido e Aceito
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+
