@@ -799,6 +799,73 @@ export const HealthProvider = ({ children }) => {
     } catch (e) {}
   };
 
+  const addFamilyMemberProfile = (memberName, memberRole = 'Dependente / Familiar') => {
+    const cleanName = memberName?.trim();
+    if (!cleanName) return;
+
+    const newMemberObj = {
+      name: cleanName,
+      role: memberRole,
+      joinedAt: new Date().toISOString()
+    };
+
+    setFamilyGroup((prev) => {
+      if (!prev) {
+        return {
+          code: familyGroupCode || 'local',
+          familyName: 'Grupo Familiar',
+          members: [
+            { name: userProfile.name, role: 'Criador' },
+            newMemberObj
+          ]
+        };
+      }
+      const existingMembers = prev.members || [];
+      if (existingMembers.some((m) => m.name.toLowerCase() === cleanName.toLowerCase())) {
+        return prev;
+      }
+      return {
+        ...prev,
+        members: [...existingMembers, newMemberObj]
+      };
+    });
+
+    const defaultMemberRecords = {
+      userProfile: {
+        name: cleanName,
+        age: 'Não informado',
+        location: 'Brasil',
+        greeting: `Acompanhamento de saúde de ${cleanName}`,
+        avatar: `https://api.dicebear.com/10.x/voxel-art/svg?seed=${encodeURIComponent(cleanName)}`,
+        bloodType: '--',
+        height: '--',
+        weight: '--',
+        allergiesAndConditions: [],
+        emergencyContact: { name: '', relation: '', phone: '' },
+        healthPlan: { name: 'Sem plano cadastrado', planType: '', number: '' }
+      },
+      medications: [],
+      intakeHistory: [],
+      exams: [],
+      appointments: [],
+      vitals: {
+        bloodPressure: { systolic: '--', diastolic: '--', unit: 'mmHg', status: 'Sem medição' },
+        heartRate: { value: '--', unit: 'bpm', status: 'Sem medição' },
+        weight: { value: '--', unit: 'kg', target: '--' },
+        glucose: { value: '--', unit: 'mg/dL', status: 'Sem medição' },
+        history7Days: []
+      }
+    };
+
+    setFamilyMembersHealthData((prev) => ({
+      ...prev,
+      [cleanName]: defaultMemberRecords
+    }));
+
+    setActiveMemberName(cleanName);
+  };
+
+
   // Action Handler: Toggle Medication Taken/Pending
   const toggleMedicationStatus = (id) => {
     setMedications((prev) =>
