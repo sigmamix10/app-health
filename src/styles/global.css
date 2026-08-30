@@ -284,6 +284,30 @@ body {
   }
 }
 
+/* Landing Page Responsive Grid System */
+.landing-container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.landing-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .landing-hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+  }
+}
+
 @media (max-width: 1023px) {
   .responsive-container .desktop-header {
     display: none;
