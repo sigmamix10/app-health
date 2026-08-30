@@ -120,16 +120,30 @@ export const AddAppointmentModal = ({ isOpen, onClose }) => {
               onChange={(e) => setSpecialty(e.target.value)}
             >
               <option value="Clínico Geral">Clínico Geral</option>
+              <option value="Alergologia e Imunologia">Alergologia e Imunologia</option>
+              <option value="Angiologia e Cirurgia Vascular">Angiologia e Cirurgia Vascular</option>
               <option value="Cardiologia">Cardiologia</option>
+              <option value="Cirurgia Geral">Cirurgia Geral</option>
               <option value="Dermatologia">Dermatologia</option>
               <option value="Endocrinologia">Endocrinologia</option>
+              <option value="Gastroenterologia">Gastroenterologia</option>
+              <option value="Geriatria">Geriatria</option>
               <option value="Ginecologia / Obstetrícia">Ginecologia / Obstetrícia</option>
+              <option value="Hematologia">Hematologia</option>
+              <option value="Infectologia">Infectologia</option>
+              <option value="Nefrologia">Nefrologia</option>
               <option value="Neurologia">Neurologia</option>
+              <option value="Nutrologia / Nutrição">Nutrologia / Nutrição</option>
               <option value="Odontologia">Odontologia</option>
               <option value="Oftalmologia">Oftalmologia</option>
+              <option value="Oncologia">Oncologia</option>
               <option value="Ortopedia">Ortopedia</option>
+              <option value="Otorrinolaringologia">Otorrinolaringologia</option>
               <option value="Pediatria">Pediatria</option>
+              <option value="Pneumologia">Pneumologia</option>
               <option value="Psiquiatria / Psicologia">Psiquiatria / Psicologia</option>
+              <option value="Reumatologia">Reumatologia</option>
+              <option value="Urologia">Urologia</option>
               <option value="Outra Especialidade">Outra Especialidade</option>
             </select>
           </div>
