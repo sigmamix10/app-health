@@ -61,7 +61,7 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
 
   const avatarGalleryOptions = {
     critters: [
-      { id: 'critter-1', url: `https://api.dicebear.com/10.x/critters/svg?seed=Mateus`, label: 'Mateus' },
+      { id: 'critter-1', url: `https://api.dicebear.com/10.x/critters/svg?seed=${encodeURIComponent(userProfile.name || 'Paciente')}`, label: 'Avatar Principal' },
       { id: 'critter-2', url: `https://api.dicebear.com/10.x/critters/svg?seed=Felix`, label: 'Felix' },
       { id: 'critter-3', url: `https://api.dicebear.com/10.x/critters/svg?seed=Oliver`, label: 'Oliver' },
       { id: 'critter-4', url: `https://api.dicebear.com/10.x/critters/svg?seed=Milo`, label: 'Milo' },
@@ -69,7 +69,7 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
       { id: 'critter-6', url: `https://api.dicebear.com/10.x/critters/svg?seed=Leo`, label: 'Leo' }
     ],
     clay: [
-      { id: 'clay-1', url: `https://api.dicebear.com/10.x/clay/svg?seed=Mateus`, label: 'Mateus 3D' },
+      { id: 'clay-1', url: `https://api.dicebear.com/10.x/clay/svg?seed=${encodeURIComponent(userProfile.name || 'Paciente')}`, label: 'Avatar 3D' },
       { id: 'clay-2', url: `https://api.dicebear.com/10.x/clay/svg?seed=Alex`, label: 'Alex 3D' },
       { id: 'clay-3', url: `https://api.dicebear.com/10.x/clay/svg?seed=Gabriel`, label: 'Gabriel 3D' },
       { id: 'clay-4', url: `https://api.dicebear.com/10.x/clay/svg?seed=Lucas`, label: 'Lucas 3D' },
@@ -77,7 +77,7 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
       { id: 'clay-6', url: `https://api.dicebear.com/10.x/clay/svg?seed=Diego`, label: 'Diego 3D' }
     ],
     avataaars: [
-      { id: 'ava-1', url: `https://api.dicebear.com/9.x/avataaars/svg?seed=Mateus`, label: 'Mateus' },
+      { id: 'ava-1', url: `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(userProfile.name || 'Paciente')}`, label: 'Avataaars' },
       { id: 'ava-2', url: `https://api.dicebear.com/9.x/avataaars/svg?seed=David`, label: 'David' },
       { id: 'ava-3', url: `https://api.dicebear.com/9.x/avataaars/svg?seed=Samuel`, label: 'Samuel' },
       { id: 'ava-4', url: `https://api.dicebear.com/9.x/avataaars/svg?seed=Victor`, label: 'Victor' },
@@ -85,15 +85,12 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
       { id: 'ava-6', url: `https://api.dicebear.com/9.x/avataaars/svg?seed=Rafael`, label: 'Rafael' }
     ],
     personas: [
-      { id: 'per-1', url: `https://api.dicebear.com/9.x/personas/svg?seed=Mateus`, label: 'Mateus' },
+      { id: 'per-1', url: `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(userProfile.name || 'Paciente')}`, label: 'Personas' },
       { id: 'per-2', url: `https://api.dicebear.com/9.x/personas/svg?seed=Arthur`, label: 'Arthur' },
       { id: 'per-3', url: `https://api.dicebear.com/9.x/personas/svg?seed=Enzo`, label: 'Enzo' },
       { id: 'per-4', url: `https://api.dicebear.com/9.x/personas/svg?seed=Bernardo`, label: 'Bernardo' },
       { id: 'per-5', url: `https://api.dicebear.com/9.x/personas/svg?seed=Caio`, label: 'Caio' },
       { id: 'per-6', url: `https://api.dicebear.com/9.x/personas/svg?seed=Pedro`, label: 'Pedro' }
-    ],
-    photo: [
-      { id: 'photo-1', url: '/avatars/mateus.jpg', label: 'Foto Estudio Mateus' }
     ]
   };
 

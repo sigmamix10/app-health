@@ -200,7 +200,7 @@ export const UserGuideTab = () => {
                   👨‍👩‍👧 Alternando a Visão entre Familiares:
                 </h4>
                 <p>
-                  Quando conectado ao Grupo Familiar, uma barra no topo exibe avatares dos membros (<code>[Mateus]</code> <code>[Ana]</code> <code>[Maria - Mãe]</code>). Basta clicar no nome do familiar para ver e atualizar os medicamentos, exames e sinais vitais dele em tempo real!
+                  Quando conectado ao Grupo Familiar, uma barra no topo exibe avatares dos membros (<code>[Você]</code> <code>[Membro 1]</code> <code>[Membro 2]</code>). Basta clicar no nome do familiar para ver e atualizar os medicamentos, exames e sinais vitais dele em tempo real!
                 </p>
               </div>
             </div>

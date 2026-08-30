@@ -9,7 +9,7 @@ import { ThemeColorModal } from '../components/modals/ThemeColorModal';
 import { AccessibilityModal } from '../components/modals/AccessibilityModal';
 
 export const ProfileTab = () => {
-  const { userProfile, familyGroupCode, familyGroup, authUser, logoutPatient, themeColor, fontScale, highContrast } = useHealth();
+  const { userProfile, familyGroupCode, familyGroup, leaveFamilyGroup, authUser, logoutPatient, themeColor, fontScale, highContrast } = useHealth();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
@@ -71,6 +71,49 @@ export const ProfileTab = () => {
           </button>
         </div>
       </div>
+
+      {/* Notice Banner if connected to a Family Group */}
+      {familyGroupCode && (
+        <div
+          style={{
+            backgroundColor: '#EFF6FF',
+            border: '1px solid #BFDBFE',
+            color: '#1E40AF',
+            borderRadius: '14px',
+            padding: '12px 16px',
+            fontSize: '13px',
+            fontWeight: 600,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.06)'
+          }}
+        >
+          <span>
+            💡 <strong>Você está no Grupo Familiar ({familyGroupCode})</strong> — Exibindo dados de saúde compartilhados do grupo. Para ver apenas seu perfil individual, saia do grupo.
+          </span>
+          <button
+            onClick={leaveFamilyGroup}
+            style={{
+              backgroundColor: '#2563EB',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <LogOut size={13} /> Ver Meu Perfil Individual
+          </button>
+        </div>
+      )}
 
       {/* Grid Responsive Container */}
       <div className="grid-responsive-2">
@@ -206,25 +249,48 @@ export const ProfileTab = () => {
                 </div>
               </div>
 
-              <button
-                onClick={() => setIsFamilyModalOpen(true)}
-                style={{
-                  backgroundColor: '#0D6C5D',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '8px 14px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                {familyGroupCode ? 'Gerenciar' : 'Entrar / Criar'}
-                <ArrowRight size={14} />
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {familyGroupCode && (
+                  <button
+                    onClick={leaveFamilyGroup}
+                    style={{
+                      backgroundColor: '#FEF2F2',
+                      color: '#DC2626',
+                      border: '1px solid #FCA5A5',
+                      borderRadius: '12px',
+                      padding: '8px 12px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    title="Sair do grupo familiar e voltar ao perfil individual"
+                  >
+                    <LogOut size={13} /> Sair
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsFamilyModalOpen(true)}
+                  style={{
+                    backgroundColor: '#0D6C5D',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '8px 14px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  {familyGroupCode ? 'Gerenciar' : 'Entrar / Criar'}
+                  <ArrowRight size={14} />
+                </button>
+              </div>
             </div>
 
             <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.4, margin: '8px 0 0 0' }}>

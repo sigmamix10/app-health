@@ -50,7 +50,7 @@ if (isFirebaseConfigured) {
 export { app, db, auth };
 
 // Document reference for default patient health record
-const DEFAULT_PATIENT_DOC_ID = 'patient_mateus_ribeiro';
+const DEFAULT_PATIENT_DOC_ID = 'patient_guest_local';
 const HEALTH_COLLECTION = 'healthRecords';
 
 // ---------------- FIREBASE AUTHENTICATION SERVICES ----------------

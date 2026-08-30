@@ -14,8 +14,8 @@ export const FamilyGroupModal = ({ isOpen, onClose }) => {
   } = useHealth();
 
   const [tab, setTab] = useState('join'); // 'create' | 'join'
-  const [familyNameInput, setFamilyNameInput] = useState('Família Ribeiro');
-  const [creatorNameInput, setCreatorNameInput] = useState(userProfile?.name || 'Mateus Ribeiro');
+  const [familyNameInput, setFamilyNameInput] = useState(userProfile?.name ? `Família ${userProfile.name}` : 'Minha Família');
+  const [creatorNameInput, setCreatorNameInput] = useState(userProfile?.name || 'Seu Nome');
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [memberNameInput, setMemberNameInput] = useState('Membro da Família');
   const [copied, setCopied] = useState(false);

@@ -151,13 +151,7 @@ export const HealthProvider = ({ children }) => {
   };
 
   // Family Group State (6-digit code persistence & Multi-Member Selection)
-  const [familyGroupCode, setFamilyGroupCode] = useState(() => {
-    try {
-      return localStorage.getItem('app_health_family_code') || null;
-    } catch (e) {
-      return null;
-    }
-  });
+  const [familyGroupCode, setFamilyGroupCode] = useState(null);
   const [familyGroup, setFamilyGroup] = useState(null);
   const [activeMemberName, setActiveMemberName] = useState(null);
   const [familyMembersHealthData, setFamilyMembersHealthData] = useState({});
@@ -166,29 +160,26 @@ export const HealthProvider = ({ children }) => {
   const [syncStatus, setSyncStatus] = useState(isFirebaseConfigured ? 'synced' : 'disconnected');
   const isRemoteUpdate = useRef(false);
 
-  // User Patient Data
+  // User Patient Data (Initialized clean, no pre-registered demo data)
   const [userProfile, setUserProfile] = useState({
-    name: 'Mateus Ribeiro',
-    age: '34 anos',
-    location: 'São Paulo, SP',
-    greeting: 'Como está sua saúde hoje?',
-    avatar: '/avatars/mateus.jpg',
-    bloodType: 'O +',
-    height: '1,82 m',
-    weight: '78,4 kg',
-    allergiesAndConditions: [
-      { text: 'Alergia: Penicilina', type: 'danger' },
-      { text: 'Hipertensão Leve', type: 'warning' }
-    ],
+    name: 'Novo Paciente',
+    age: 'Não informado',
+    location: 'Brasil',
+    greeting: 'Bem-vindo ao seu acompanhamento de saúde!',
+    avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Paciente',
+    bloodType: '--',
+    height: '--',
+    weight: '--',
+    allergiesAndConditions: [],
     emergencyContact: {
-      name: 'Ana Ribeiro',
-      relation: 'Esposa',
-      phone: '(11) 98765-4321'
+      name: '',
+      relation: '',
+      phone: ''
     },
     healthPlan: {
-      name: 'Bradesco Saúde',
-      planType: 'Nacional Flex',
-      number: 'Nº 4279 8812 0031'
+      name: 'Sem plano cadastrado',
+      planType: '',
+      number: ''
     }
   });
 
@@ -234,20 +225,8 @@ export const HealthProvider = ({ children }) => {
     };
   };
 
-  // Daily Intake History Log (Matches patient intake tracking)
-  const [intakeHistory, setIntakeHistory] = useState([
-    {
-      id: 'intake-1',
-      medId: 'med-1',
-      medName: 'Losartana Potássica',
-      dosage: '50mg',
-      quantityTaken: 1,
-      unit: 'comprimido',
-      timeTaken: '08:00',
-      dateTaken: new Date().toLocaleDateString('pt-BR'),
-      notes: 'Tomado no café da manhã'
-    }
-  ]);
+  // Daily Intake History Log
+  const [intakeHistory, setIntakeHistory] = useState([]);
 
   // Action Handler: Log Dose Intake with custom quantity and time
   const logDoseIntake = ({ medId, medName, dosage, quantityTaken = 1, timeTaken, notes }) => {
@@ -288,230 +267,39 @@ export const HealthProvider = ({ children }) => {
     );
   };
 
-  const [medications, setMedications] = useState([
-    {
-      id: 'med-1',
-      name: 'Losartana Potássica',
-      shortName: 'Losartana',
-      dosage: '50mg',
-      frequency: '1x ao dia',
-      dailyDoseCount: 1,
-      currentStock: 14,
-      totalStock: 30,
-      time: '08:00',
-      status: 'taken', // 'taken' | 'pending'
-      statusText: 'Tomado',
-      nextDose: 'Próxima dose: Amanhã às 08:00',
-      category: 'active',
-      iconBg: '#E6F5F2',
-      iconColor: '#0D6C5D'
-    },
-    {
-      id: 'med-2',
-      name: 'Metformina Cloridrato',
-      shortName: 'Metformina',
-      dosage: '850mg',
-      frequency: '2x ao dia',
-      dailyDoseCount: 2,
-      currentStock: 6,
-      totalStock: 30,
-      time: '12:00',
-      status: 'pending',
-      statusText: 'Pendente',
-      tagText: 'Às 12:00',
-      nextDose: 'Segunda dose: Hoje às 20:00',
-      category: 'active',
-      iconBg: '#FEF3C7',
-      iconColor: '#D97706'
-    },
-    {
-      id: 'med-3',
-      name: 'Atorvastatina Cálcica',
-      shortName: 'Atorvastatina',
-      dosage: '20mg',
-      frequency: '1x ao dia',
-      dailyDoseCount: 1,
-      currentStock: 25,
-      totalStock: 30,
-      time: '22:00',
-      status: 'pending',
-      statusText: 'Pendente',
-      tagText: 'Às 22:00',
-      nextDose: 'Uso contínuo noturno',
-      category: 'active',
-      iconBg: '#FEF3C7',
-      iconColor: '#D97706'
-    },
-    {
-      id: 'med-5',
-      name: 'Vitamina D3',
-      shortName: 'Vitamina D3',
-      dosage: '50.000 UI',
-      frequency: 'Apenas aos Domingos',
-      dailyDoseCount: 0.14,
-      currentStock: 8,
-      totalStock: 10,
-      time: '09:00',
-      status: 'pending',
-      statusText: 'Pendente',
-      tagText: 'Domingo às 09:00',
-      nextDose: 'Próxima dose: Domingo às 09:00',
-      category: 'active',
-      iconBg: '#E0F2FE',
-      iconColor: '#0284C7'
-    },
-    {
-      id: 'med-4',
-      name: 'Amoxicilina',
-      shortName: 'Amoxicilina',
-      dosage: '500mg',
-      frequency: 'Tratamento finalizado',
-      dailyDoseCount: 0,
-      currentStock: 0,
-      totalStock: 14,
-      time: '08:00',
-      status: 'taken',
-      statusText: 'Arquivado',
-      nextDose: 'Uso encerrado',
-      category: 'archived',
-      iconBg: '#F1F5F9',
-      iconColor: '#64748B'
-    }
-  ]);
+  // Medications Data (Initialized empty)
+  const [medications, setMedications] = useState([]);
 
-  // Exams Data (Matches Screenshot 3)
-  const [exams, setExams] = useState([
-    {
-      id: 'exam-1',
-      title: 'Hemograma Completo',
-      lab: 'Laboratório Fleury',
-      status: 'Disponível',
-      date: '12 Out 2026',
-      summary: 'Hemoglobina estável (14.2 g/dL), leucócitos normais (6.800/mm³). Sem sinais de infecção ou anemia.',
-      details: {
-        hemoglobin: '14.2 g/dL (Ref: 13.5 - 17.5)',
-        platelets: '240.000 /mm³ (Ref: 150.000 - 450.000)',
-        leukocytes: '6.800 /mm³ (Ref: 4.500 - 11.000)',
-        hematocrit: '42% (Ref: 41 - 53%)'
-      },
-      pdfFile: 'Hemograma_Completo_Mateus_Ribeiro.pdf',
-      type: 'lab'
-    },
-    {
-      id: 'exam-2',
-      title: 'Perfil Lipídico Completo',
-      lab: 'Laboratório Sabin',
-      status: 'Disponível',
-      date: '10 Out 2026',
-      summary: 'LDL: 110mg/dL (Desejável menor que 100). HDL e Triglicerídeos dentro da normalidade.',
-      details: {
-        totalCholesterol: '185 mg/dL (Ref: < 190)',
-        hdl: '52 mg/dL (Ref: > 40)',
-        ldl: '110 mg/dL (Ref: < 100)',
-        triglycerides: '115 mg/dL (Ref: < 150)'
-      },
-      pdfFile: 'Perfil_Lipidico_Mateus_Ribeiro.pdf',
-      type: 'lab'
-    },
-    {
-      id: 'exam-3',
-      title: 'Ultrassom Abdominal',
-      lab: 'Clínica MedImagem',
-      status: 'Agendado',
-      date: '05 Nov 2026 • 09:00',
-      summary: 'Exame agendado. Requer jejum absoluto de 8 horas e ingestão de 4 copos de água 1 hora antes.',
-      preparationInstructions: [
-        'Jejum absoluto de alimentos e água por 8 horas antes do horário do exame.',
-        'Tomar 4 copos de água sem gás 1 hora antes e não urinar até a realização.',
-        'Trazer exames anteriores de ultrassom se houver.',
-        'Chegar com 20 minutos de antecedência na recepção da Clínica MedImagem.'
-      ],
-      type: 'imaging'
-    }
-  ]);
+  // Exams Data (Initialized empty)
+  const [exams, setExams] = useState([]);
 
-  // Appointments / Consultations Data (Matches Screenshots 1 & 4)
-  const [appointments, setAppointments] = useState([
-    {
-      id: 'app-1',
-      doctor: 'Dr. Alexandre Santos',
-      specialty: 'Cardiologista',
-      hospital: 'Hospital Albert Einstein - Bloco B, Cj 402',
-      dateText: 'Amanhã',
-      timeText: '14:30',
-      fullDate: '28 de Agosto, às 14:30',
-      type: 'Atendimento presencial',
-      insurance: 'Convênio Bradesco Saúde',
-      status: 'Confirmado', // 'Confirmado' | 'Amanhã'
-      avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Alexandre',
-      address: 'Av. Albert Einstein, 627 - Morumbi, São Paulo - SP',
-      isUpcoming: true
-    },
-    {
-      id: 'app-2',
-      doctor: 'Dra. Beatriz Costa',
-      specialty: 'Endocrinologista',
-      hospital: 'Consultório Jardins - Av. Paulista, 1500',
-      dateText: '04 Nov',
-      timeText: '10:00',
-      fullDate: '04 de Novembro, às 10:00',
-      type: 'Consulta de Rotina',
-      insurance: 'Convênio Bradesco Saúde',
-      status: 'Agendado',
-      avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Beatriz',
-      address: 'Av. Paulista, 1500 - Cj 82, Jardins, São Paulo - SP',
-      isUpcoming: true
-    },
-    {
-      id: 'app-3',
-      doctor: 'Dr. Carlos Eduardo',
-      specialty: 'Clínico Geral',
-      hospital: 'Centro Médico Paulista',
-      dateText: '10 Set 2026',
-      timeText: '16:00',
-      fullDate: '10 de Setembro de 2026',
-      type: 'Consulta Realizada',
-      insurance: 'Convênio Bradesco Saúde',
-      status: 'Realizada',
-      avatar: 'https://api.dicebear.com/10.x/voxel-art/svg?seed=Carlos',
-      address: 'Rua Vergueiro, 1200 - Vila Mariana, São Paulo - SP',
-      isUpcoming: false
-    }
-  ]);
+  // Appointments / Consultations Data (Initialized empty)
+  const [appointments, setAppointments] = useState([]);
 
-  // Vital Signs Data (Matches Screenshots 1 & 5)
+  // Vital Signs Data (Initialized empty)
   const [vitals, setVitals] = useState({
     bloodPressure: {
-      systolic: 120,
-      diastolic: 80,
+      systolic: '--',
+      diastolic: '--',
       unit: 'mmHg',
-      status: 'Estável e ideal',
-      trend: 'up'
+      status: 'Sem medição'
     },
     heartRate: {
-      value: 72,
+      value: '--',
       unit: 'bpm',
-      status: 'Ritmo perfeito'
+      status: 'Sem medição'
     },
     weight: {
-      value: 78.4,
+      value: '--',
       unit: 'kg',
-      target: 75.0
+      target: '--'
     },
     glucose: {
-      value: 92,
+      value: '--',
       unit: 'mg/dL',
-      status: 'Excelente controle'
+      status: 'Sem medição'
     },
-    history7Days: [
-      { day: 'Seg', systolic: 118, diastolic: 78 },
-      { day: 'Ter', systolic: 122, diastolic: 82 },
-      { day: 'Qua', systolic: 119, diastolic: 79 },
-      { day: 'Qui', systolic: 125, diastolic: 84 },
-      { day: 'Sex', systolic: 121, diastolic: 80 },
-      { day: 'Sáb', systolic: 117, diastolic: 76 },
-      { day: 'Dom', systolic: 120, diastolic: 80 }
-    ]
+    history7Days: []
   });
 
   // 0. Subscribe to Firebase Auth Changes
