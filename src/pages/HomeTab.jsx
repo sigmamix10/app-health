@@ -333,9 +333,14 @@ export const HomeTab = () => {
                       <Pill size={22} />
                     </div>
                     <div>
-                      <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
-                        {med.shortName || med.name}
-                      </h4>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                          {med.shortName || med.name}
+                        </h4>
+                        <span style={{ fontSize: '11px', background: med.acquisitionType === 'ubs' ? '#E0F2FE' : '#E6F5F2', color: med.acquisitionType === 'ubs' ? '#0369A1' : '#0D6C5D', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                          {med.acquisitionType === 'ubs' ? '🏛️ Posto' : '🛒 Farmácia'}
+                        </span>
+                      </div>
                       <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
                         {med.dosage} ({med.doseQuantity || 1} {med.unit || 'un.'}) • Às {med.time}
                       </p>

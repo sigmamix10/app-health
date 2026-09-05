@@ -25,7 +25,10 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
     selectedDays: ['Seg', 'Qua', 'Sex'],
     alternateInterval: 'Dia sim, dia não (a cada 48h)',
     time: '08:00',
-    currentStock: '30'
+    currentStock: '30',
+    acquisitionType: 'ubs', // 'ubs' (Posto de Saúde / SUS) | 'pharmacy' (Comprado)
+    locationName: '',
+    nextPickupDate: ''
   });
 
   const [searchResults, setSearchResults] = useState([]);
@@ -114,7 +117,10 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
       frequencyType: formData.frequencyType,
       selectedDays: formData.selectedDays,
       time: formData.time,
-      currentStock: formData.currentStock
+      currentStock: formData.currentStock,
+      acquisitionType: formData.acquisitionType,
+      locationName: formData.locationName,
+      nextPickupDate: formData.nextPickupDate
     });
 
     setFormData({
@@ -127,7 +133,10 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
       selectedDays: ['Seg', 'Qua', 'Sex'],
       alternateInterval: 'Dia sim, dia não (a cada 48h)',
       time: '08:00',
-      currentStock: '30'
+      currentStock: '30',
+      acquisitionType: 'ubs',
+      locationName: '',
+      nextPickupDate: ''
     });
     onClose();
   };
@@ -468,6 +477,78 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
                 onChange={(e) => setFormData({ ...formData, currentStock: e.target.value })}
                 required
               />
+            </div>
+          </div>
+
+          {/* Acquisition Source (UBS / Posto de Saúde vs Farmácia Comprado) */}
+          <div className="form-group" style={{ background: '#F8FAFC', padding: '14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+            <label className="form-label" style={{ marginBottom: '8px', color: '#0F172A' }}>
+              📍 Como você obtém este medicamento?
+            </label>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, acquisitionType: 'ubs' })}
+                style={{
+                  padding: '10px 8px',
+                  borderRadius: '10px',
+                  border: formData.acquisitionType === 'ubs' ? '2px solid #0284C7' : '1px solid #CBD5E1',
+                  background: formData.acquisitionType === 'ubs' ? '#E0F2FE' : '#FFFFFF',
+                  color: formData.acquisitionType === 'ubs' ? '#0369A1' : '#475569',
+                  fontWeight: 800,
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  textAlign: 'center'
+                }}
+              >
+                🏛️ Posto de Saúde (SUS)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, acquisitionType: 'pharmacy' })}
+                style={{
+                  padding: '10px 8px',
+                  borderRadius: '10px',
+                  border: formData.acquisitionType === 'pharmacy' ? '2px solid #0D6C5D' : '1px solid #CBD5E1',
+                  background: formData.acquisitionType === 'pharmacy' ? '#E6F5F2' : '#FFFFFF',
+                  color: formData.acquisitionType === 'pharmacy' ? '#0D6C5D' : '#475569',
+                  fontWeight: 800,
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  textAlign: 'center'
+                }}
+              >
+                🛒 Comprado em Farmácia
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div>
+                <label className="form-label" style={{ fontSize: '11px' }}>
+                  {formData.acquisitionType === 'ubs' ? 'Nome do Posto / UBS' : 'Farmácia Preferencial'}
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder={formData.acquisitionType === 'ubs' ? 'Ex: UBS Vila Mariana' : 'Ex: Drogaria São Paulo'}
+                  value={formData.locationName}
+                  onChange={(e) => setFormData({ ...formData, locationName: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="form-label" style={{ fontSize: '11px' }}>
+                  {formData.acquisitionType === 'ubs' ? 'Próxima Retirada no Posto' : 'Próxima Compra'}
+                </label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={formData.nextPickupDate}
+                  onChange={(e) => setFormData({ ...formData, nextPickupDate: e.target.value })}
+                />
+              </div>
             </div>
           </div>
 

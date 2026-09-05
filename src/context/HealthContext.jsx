@@ -735,13 +735,16 @@ export const HealthProvider = ({ children }) => {
       currentStock: initialStock,
       totalStock: initialStock,
       time: newMed.time || '08:00',
+      acquisitionType: newMed.acquisitionType || 'ubs', // 'ubs' | 'pharmacy' | 'other'
+      locationName: newMed.locationName || '',
+      nextPickupDate: newMed.nextPickupDate || '',
       status: 'pending',
       statusText: 'Pendente',
       tagText: `Às ${newMed.time || '08:00'}`,
       nextDose: `Agendado às ${newMed.time || '08:00'}`,
       category: 'active',
-      iconBg: newMed.frequencyType === 'specific_days' ? '#E0F2FE' : '#FEF3C7',
-      iconColor: newMed.frequencyType === 'specific_days' ? '#0284C7' : '#D97706'
+      iconBg: newMed.acquisitionType === 'ubs' ? '#E0F2FE' : newMed.frequencyType === 'specific_days' ? '#E6F5F2' : '#FEF3C7',
+      iconColor: newMed.acquisitionType === 'ubs' ? '#0284C7' : newMed.frequencyType === 'specific_days' ? '#0D6C5D' : '#D97706'
     };
     setMedications((prev) => [medObj, ...prev]);
   };

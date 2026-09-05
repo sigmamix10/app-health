@@ -30,6 +30,9 @@ export const MedicationsTab = () => {
     return pred.daysLeft <= 7;
   });
 
+  // Medications with UBS Pickup Dates scheduled
+  const ubsPickupMeds = activeMeds.filter((m) => m.acquisitionType === 'ubs' || m.nextPickupDate);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
       {/* Family Group Member Selector Bar */}
@@ -42,7 +45,7 @@ export const MedicationsTab = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 className="page-title">Medicamentos • {userProfile?.name}</h1>
-          <p className="page-subtitle">Acompanhe horários, histórico de ingestão e estoque</p>
+          <p className="page-subtitle">Acompanhe horários, retirada no posto e estoque</p>
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -112,6 +115,64 @@ export const MedicationsTab = () => {
         </div>
       </div>
 
+      {/* UBS Health Center Pickup Reminder Banner */}
+      {ubsPickupMeds.length > 0 && filter === 'active' && (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%)',
+            border: '1px solid #7DD3FC',
+            padding: '16px 18px',
+            borderRadius: '18px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '20px' }}>🏛️</span>
+            <div>
+              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0369A1' }}>
+                Próximas Retiradas no Posto de Saúde (UBS / SUS)
+              </h4>
+              <p style={{ fontSize: '12px', color: '#0284C7', fontWeight: 600 }}>
+                Retirada gratuita agendada nas Unidades Básicas de Saúde
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {ubsPickupMeds.map((med) => (
+              <div
+                key={med.id}
+                style={{
+                  background: '#FFFFFF',
+                  padding: '10px 14px',
+                  borderRadius: '12px',
+                  border: '1px solid #93C5FD',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Pill size={14} style={{ color: '#0284C7' }} />
+                <div>
+                  <strong style={{ color: '#0F172A' }}>{med.name}</strong>
+                  <div style={{ fontSize: '11px', color: '#475569' }}>
+                    📍 {med.locationName || 'Posto de Saúde (UBS)'}
+                    {med.nextPickupDate && (
+                      <span style={{ color: '#0284C7', fontWeight: 700, marginLeft: '6px' }}>
+                        📅 Retirar em: {new Date(med.nextPickupDate + 'T00:00:00').toLocaleDateString('pt-BR')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Low Stock Warning Alert Banner */}
       {lowStockMeds.length > 0 && filter === 'active' && (
         <div
@@ -159,6 +220,7 @@ export const MedicationsTab = () => {
           displayedMeds.map((med) => {
             const prediction = calculateStockPrediction(med.currentStock, med.dailyDoseCount);
             const stockPercent = Math.min(100, Math.round((med.currentStock / (med.totalStock || 30)) * 100));
+            const isUbs = med.acquisitionType === 'ubs' || !med.acquisitionType;
 
             return (
             <div
@@ -193,10 +255,38 @@ export const MedicationsTab = () => {
                   </div>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>{med.name}</h3>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#E6F5F2', color: '#0D6C5D', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, marginTop: '4px' }}>
-                      💊 {med.doseQuantity || 1} {med.unit || 'comprimido(s)'} a cada tomada ({med.dosage})
+
+                    {/* Source Tag: UBS vs Pharmacy */}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                      <span
+                        style={{
+                          background: isUbs ? '#E0F2FE' : '#E6F5F2',
+                          color: isUbs ? '#0369A1' : '#0D6C5D',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        {isUbs ? '🏛️ Posto de Saúde (SUS)' : '🛒 Comprado em Farmácia'}
+                        {med.locationName ? ` • ${med.locationName}` : ''}
+                      </span>
+
+                      <span style={{ background: '#F1F5F9', color: '#334155', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
+                        💊 {med.doseQuantity || 1} {med.unit || 'un.'} ({med.dosage})
+                      </span>
                     </div>
-                    <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500, marginTop: '4px' }}>
+
+                    {med.nextPickupDate && (
+                      <p style={{ fontSize: '11px', color: isUbs ? '#0284C7' : '#0D6C5D', fontWeight: 700, marginTop: '4px' }}>
+                        📅 {isUbs ? 'Próxima retirada no posto' : 'Próxima compra'}: <strong>{new Date(med.nextPickupDate + 'T00:00:00').toLocaleDateString('pt-BR')}</strong>
+                      </p>
+                    )}
+
+                    <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
                       Frequência: {med.frequency}
                     </p>
                   </div>
