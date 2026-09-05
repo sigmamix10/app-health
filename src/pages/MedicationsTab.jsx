@@ -47,10 +47,7 @@ export const MedicationsTab = () => {
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
-            onClick={() => {
-              setSelectedMedForDose(null);
-              setIsLogDoseOpen(true);
-            }}
+            onClick={() => setIsAddOpen(true)}
             style={{
               backgroundColor: '#0D6C5D',
               color: '#FFFFFF',
@@ -65,6 +62,29 @@ export const MedicationsTab = () => {
               gap: '6px',
               cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(13, 108, 93, 0.25)'
+            }}
+          >
+            <Plus size={16} /> Novo Medicamento
+          </button>
+
+          <button
+            onClick={() => {
+              setSelectedMedForDose(null);
+              setIsLogDoseOpen(true);
+            }}
+            style={{
+              backgroundColor: '#E6F5F2',
+              color: '#0D6C5D',
+              border: '1px solid #BCE5DC',
+              borderRadius: '100px',
+              padding: '8px 16px',
+              fontFamily: 'inherit',
+              fontSize: '13px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer'
             }}
           >
             <CheckCircle2 size={16} /> Registrar Dose
@@ -173,8 +193,11 @@ export const MedicationsTab = () => {
                   </div>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>{med.name}</h3>
-                    <p style={{ fontSize: '13px', color: '#64748B', fontWeight: 500, marginTop: '2px' }}>
-                      {med.dosage} • {med.frequency}
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#E6F5F2', color: '#0D6C5D', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, marginTop: '4px' }}>
+                      💊 {med.doseQuantity || 1} {med.unit || 'comprimido(s)'} a cada tomada ({med.dosage})
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500, marginTop: '4px' }}>
+                      Frequência: {med.frequency}
                     </p>
                   </div>
                 </div>

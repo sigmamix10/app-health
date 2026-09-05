@@ -337,7 +337,7 @@ export const HomeTab = () => {
                         {med.shortName || med.name}
                       </h4>
                       <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
-                        {med.dosage} • {med.time}
+                        {med.dosage} ({med.doseQuantity || 1} {med.unit || 'un.'}) • Às {med.time}
                       </p>
                     </div>
                   </div>

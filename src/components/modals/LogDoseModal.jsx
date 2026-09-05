@@ -12,10 +12,15 @@ export const LogDoseModal = ({ isOpen, onClose, selectedMed }) => {
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
+    let targetMed = selectedMed;
     if (selectedMed) {
       setMedId(selectedMed.id);
     } else if (activeMeds.length > 0) {
       setMedId(activeMeds[0].id);
+      targetMed = activeMeds[0];
+    }
+    if (targetMed) {
+      setQuantity(targetMed.doseQuantity ? String(targetMed.doseQuantity) : '1');
     }
     const nowStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     setTimeTaken(nowStr);
@@ -24,6 +29,14 @@ export const LogDoseModal = ({ isOpen, onClose, selectedMed }) => {
   if (!isOpen) return null;
 
   const currentMed = activeMeds.find((m) => m.id === medId) || activeMeds[0];
+
+  const handleSelectMedId = (id) => {
+    setMedId(id);
+    const selected = activeMeds.find((m) => m.id === id);
+    if (selected && selected.doseQuantity) {
+      setQuantity(String(selected.doseQuantity));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -64,11 +77,11 @@ export const LogDoseModal = ({ isOpen, onClose, selectedMed }) => {
             <select
               className="form-select"
               value={medId}
-              onChange={(e) => setMedId(e.target.value)}
+              onChange={(e) => handleSelectMedId(e.target.value)}
             >
               {activeMeds.map((med) => (
                 <option key={med.id} value={med.id}>
-                  {med.name} ({med.dosage}) - Estoque: {med.currentStock} un.
+                  {med.name} ({med.dosage}) - Dose recomendada: {med.doseQuantity || 1} {med.unit || 'un.'} (Estoque: {med.currentStock})
                 </option>
               ))}
             </select>

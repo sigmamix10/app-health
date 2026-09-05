@@ -697,24 +697,27 @@ export const HealthProvider = ({ children }) => {
 
   // Action Handler: Add New Medication
   const addMedication = (newMed) => {
-    let dailyCount = 1;
+    let intakesPerDay = 1;
 
     if (newMed.frequencyType === 'specific_days' && Array.isArray(newMed.selectedDays)) {
-      dailyCount = Number((newMed.selectedDays.length / 7).toFixed(2));
+      intakesPerDay = Number((newMed.selectedDays.length / 7).toFixed(2));
     } else if (newMed.frequencyType === 'alternate_days') {
-      if (newMed.frequency.includes('A cada 3 dias')) dailyCount = 0.33;
-      else if (newMed.frequency.includes('A cada 4 dias')) dailyCount = 0.25;
-      else if (newMed.frequency.includes('Semanalmente')) dailyCount = 0.14;
-      else if (newMed.frequency.includes('15 dias')) dailyCount = 0.07;
-      else dailyCount = 0.5; // Dia sim, dia não (48h)
+      if (newMed.frequency?.includes('A cada 3 dias')) intakesPerDay = 0.33;
+      else if (newMed.frequency?.includes('A cada 4 dias')) intakesPerDay = 0.25;
+      else if (newMed.frequency?.includes('Semanalmente')) intakesPerDay = 0.14;
+      else if (newMed.frequency?.includes('15 dias')) intakesPerDay = 0.07;
+      else intakesPerDay = 0.5; // Dia sim, dia não (48h)
     } else if (newMed.frequencyType === 'as_needed') {
-      dailyCount = 0.1;
+      intakesPerDay = 0.1;
     } else {
-      if (newMed.frequency.includes('2x')) dailyCount = 2;
-      else if (newMed.frequency.includes('3x')) dailyCount = 3;
-      else dailyCount = 1;
+      if (newMed.frequency?.includes('2x')) intakesPerDay = 2;
+      else if (newMed.frequency?.includes('3x')) intakesPerDay = 3;
+      else intakesPerDay = 1;
     }
 
+    const doseQty = Number(newMed.doseQuantity) || 1;
+    const unitStr = newMed.unit || 'comprimido(s)';
+    const dailyCount = Number((intakesPerDay * doseQty).toFixed(2));
     const initialStock = Number(newMed.currentStock) || 30;
 
     const medObj = {
@@ -722,6 +725,9 @@ export const HealthProvider = ({ children }) => {
       name: newMed.name,
       shortName: newMed.name.split(' ')[0],
       dosage: newMed.dosage,
+      doseQuantity: doseQty,
+      unit: unitStr,
+      dosePerIntakeText: `${doseQty} ${unitStr} por tomada`,
       frequency: newMed.frequency,
       frequencyType: newMed.frequencyType || 'daily',
       selectedDays: newMed.selectedDays || [],
@@ -743,7 +749,20 @@ export const HealthProvider = ({ children }) => {
   // Action Handler: Edit Medication
   const updateMedication = (id, updatedFields) => {
     setMedications((prev) =>
-      prev.map((med) => (med.id === id ? { ...med, ...updatedFields } : med))
+      prev.map((med) => {
+        if (med.id === id) {
+          const doseQty = updatedFields.doseQuantity !== undefined ? Number(updatedFields.doseQuantity) : (med.doseQuantity || 1);
+          const unitStr = updatedFields.unit !== undefined ? updatedFields.unit : (med.unit || 'comprimido(s)');
+          return {
+            ...med,
+            ...updatedFields,
+            doseQuantity: doseQty,
+            unit: unitStr,
+            dosePerIntakeText: `${doseQty} ${unitStr} por tomada`
+          };
+        }
+        return med;
+      })
     );
   };
 

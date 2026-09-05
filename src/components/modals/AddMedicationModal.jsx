@@ -18,6 +18,8 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     dosage: '',
+    doseQuantity: '1',
+    unit: 'comprimido(s)',
     frequencyType: 'daily', // 'daily' | 'specific_days' | 'alternate_days' | 'as_needed'
     dailyFrequency: '1x ao dia',
     selectedDays: ['Seg', 'Qua', 'Sex'],
@@ -106,6 +108,8 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
     addMedication({
       name: formData.name,
       dosage: formData.dosage,
+      doseQuantity: formData.doseQuantity,
+      unit: formData.unit,
       frequency: computedFrequency,
       frequencyType: formData.frequencyType,
       selectedDays: formData.selectedDays,
@@ -116,6 +120,8 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
     setFormData({
       name: '',
       dosage: '',
+      doseQuantity: '1',
+      unit: 'comprimido(s)',
       frequencyType: 'daily',
       dailyFrequency: '1x ao dia',
       selectedDays: ['Seg', 'Qua', 'Sex'],
@@ -204,16 +210,77 @@ export const AddMedicationModal = ({ isOpen, onClose }) => {
             )}
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Dosagem</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Ex: 50mg, 10ml, 1 comprimido"
-              value={formData.dosage}
-              onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
-              required
-            />
+          {/* Dosage (Concentration) & Quantity Per Intake */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label className="form-label">Dosagem / Concentração</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Ex: 50mg, 500mg, 10mg/ml"
+                value={formData.dosage}
+                onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Unidade / Forma</label>
+              <select
+                className="form-select"
+                value={formData.unit}
+                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              >
+                <option value="comprimido(s)">Comprimido(s)</option>
+                <option value="cápsula(s)">Cápsula(s)</option>
+                <option value="ml">ml (Mililitros)</option>
+                <option value="gotas">Gotas</option>
+                <option value="flaconete(s)">Flaconete(s)</option>
+                <option value="dose(s)">Dose(s) / Sachê</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group" style={{ background: '#E6F5F2', padding: '12px', borderRadius: '14px', border: '1px solid #BCE5DC' }}>
+            <label className="form-label" style={{ color: '#0D6C5D', marginBottom: '6px' }}>
+              💊 Quantidade a tomar por vez:
+            </label>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              {['1', '2', '0.5'].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, doseQuantity: preset })}
+                  style={{
+                    flex: '1',
+                    padding: '8px',
+                    borderRadius: '10px',
+                    border: formData.doseQuantity === preset ? '2px solid #0D6C5D' : '1px solid #CBD5E1',
+                    background: formData.doseQuantity === preset ? '#0D6C5D' : '#FFFFFF',
+                    color: formData.doseQuantity === preset ? '#FFFFFF' : '#334155',
+                    fontWeight: 800,
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {preset} {preset === '1' ? 'unidade' : 'unidades'}
+                </button>
+              ))}
+              <input
+                type="number"
+                step="any"
+                min="0.1"
+                className="form-input"
+                style={{ width: '80px', textAlign: 'center', fontWeight: 800 }}
+                value={formData.doseQuantity}
+                onChange={(e) => setFormData({ ...formData, doseQuantity: e.target.value })}
+                required
+              />
+            </div>
+            <p style={{ fontSize: '11px', color: '#0D6C5D', fontWeight: 600, marginTop: '8px' }}>
+              📌 Resumo da dose: <strong>Tomar {formData.doseQuantity} {formData.unit} ({formData.dosage || 'ex: 50mg'})</strong> a cada horário agendado.
+            </p>
           </div>
 
           {/* Frequency Type Selector (Daily, Specific Days, Alternate, SOS) */}

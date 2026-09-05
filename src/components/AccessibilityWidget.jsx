@@ -35,7 +35,8 @@ export const AccessibilityWidget = () => {
     }
 
     if (pendingMeds.length > 0) {
-      audioText += `Você tem ${pendingMeds.length} medicamento(s) pendente(s) hoje, incluindo ${pendingMeds.map((m) => m.shortName).join(' e ')}. `;
+      const medListText = pendingMeds.map((m) => `${m.doseQuantity || 1} ${m.unit || 'comprimido'} de ${m.shortName || m.name} ${m.dosage}`).join(' e ');
+      audioText += `Você tem ${pendingMeds.length} medicamento(s) pendente(s) hoje, incluindo ${medListText}. `;
     } else {
       audioText += `Todos os seus medicamentos de hoje já foram tomados. Parabéns pelo cuidado! `;
     }
