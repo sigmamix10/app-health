@@ -151,7 +151,13 @@ export const HealthProvider = ({ children }) => {
   };
 
   // Family Group State (6-digit code persistence & Multi-Member Selection)
-  const [familyGroupCode, setFamilyGroupCode] = useState(null);
+  const [familyGroupCode, setFamilyGroupCode] = useState(() => {
+    try {
+      return localStorage.getItem('app_health_family_code') || null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [familyGroup, setFamilyGroup] = useState(null);
   const [activeMemberName, setActiveMemberName] = useState(null);
   const [familyMembersHealthData, setFamilyMembersHealthData] = useState({});
@@ -383,6 +389,12 @@ export const HealthProvider = ({ children }) => {
             if (remoteData.exams) setExams(remoteData.exams);
             if (remoteData.appointments) setAppointments(remoteData.appointments);
             if (remoteData.vitals) setVitals(remoteData.vitals);
+            if (remoteData.familyGroupCode && !familyGroupCode) {
+              setFamilyGroupCode(remoteData.familyGroupCode);
+              try {
+                localStorage.setItem('app_health_family_code', remoteData.familyGroupCode);
+              } catch (e) {}
+            }
             setSyncStatus('synced');
             setTimeout(() => {
               isRemoteUpdate.current = false;
@@ -458,7 +470,8 @@ export const HealthProvider = ({ children }) => {
         intakeHistory,
         exams,
         appointments,
-        vitals
+        vitals,
+        familyGroupCode: familyGroupCode || null
       };
 
       if (familyGroupCode) {
@@ -557,6 +570,19 @@ export const HealthProvider = ({ children }) => {
       try {
         localStorage.setItem('app_health_family_code', result.code);
       } catch (e) {}
+
+      if (authUser?.uid) {
+        savePatientRecordToFirestore(authUser.uid, {
+          userProfile,
+          medications,
+          intakeHistory,
+          exams,
+          appointments,
+          vitals,
+          familyGroupCode: result.code
+        }).catch(() => {});
+      }
+
       return result;
     } catch (error) {
       console.error('Error creating family group:', error);
@@ -572,6 +598,19 @@ export const HealthProvider = ({ children }) => {
       try {
         localStorage.setItem('app_health_family_code', result.code);
       } catch (e) {}
+
+      if (authUser?.uid) {
+        savePatientRecordToFirestore(authUser.uid, {
+          userProfile,
+          medications,
+          intakeHistory,
+          exams,
+          appointments,
+          vitals,
+          familyGroupCode: result.code
+        }).catch(() => {});
+      }
+
       return result;
     } catch (error) {
       console.error('Error joining family group:', error);
@@ -585,6 +624,18 @@ export const HealthProvider = ({ children }) => {
     try {
       localStorage.removeItem('app_health_family_code');
     } catch (e) {}
+
+    if (authUser?.uid) {
+      savePatientRecordToFirestore(authUser.uid, {
+        userProfile,
+        medications,
+        intakeHistory,
+        exams,
+        appointments,
+        vitals,
+        familyGroupCode: null
+      }).catch(() => {});
+    }
   };
 
   const addFamilyMemberProfile = (memberName, memberRole = 'Dependente / Familiar') => {
